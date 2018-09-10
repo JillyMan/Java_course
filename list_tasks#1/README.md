@@ -1,1 +1,1 @@
-For run task need go to https://www.draw.io/ 
+For run task *.xml need go to https://www.draw.io/ 
