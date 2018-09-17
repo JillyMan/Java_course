@@ -1,11 +1,11 @@
 package BusinessObjects;
 
-public abstract class Emplyee {
+public abstract class Employee {
 	private PersonalInfo personaInfo;
 	private IdCard idCard;
 	private Position position;
 
-	public Emplyee(PersonalInfo personaInfo, IdCard idCard, Position position) {
+	public Employee(PersonalInfo personaInfo, IdCard idCard, Position position) {
 		super();
 		this.personaInfo = personaInfo;
 		this.idCard = idCard;
