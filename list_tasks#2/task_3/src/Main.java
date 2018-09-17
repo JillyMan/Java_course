@@ -1,4 +1,4 @@
-import com.assembly.Assembly;
+import com.assembly.AssemblyLaptop;
 import com.lineSteps.LineStepCorps;
 import com.lineSteps.LineStepMatherBoard;
 import com.lineSteps.LineStepMonitor;
@@ -10,8 +10,8 @@ public class Main {
 		LineStepCorps corps = new LineStepCorps();
 		LineStepMatherBoard mboard = new LineStepMatherBoard();
 		LineStepMonitor monitor = new LineStepMonitor();
-	
-		Assembly assm = new Assembly(corps, mboard, monitor);
+		
+		AssemblyLaptop assm = new AssemblyLaptop(corps, mboard, monitor);
 		IProduct laptop = new Laptop();
 		laptop = assm.assemblyProduct(laptop);
 		System.out.println("complete");
