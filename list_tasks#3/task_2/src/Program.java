@@ -1,8 +1,6 @@
 import java.util.Random;
 
-public class Program {
-	public static final Random random = new Random();
-	
+public class Program {	
 	public static void main(String[] args) { 
 		int number = GenaratorNumbers().getRandom(100, 999);
 		System.out.println(number);
