@@ -13,22 +13,17 @@ public class Storage {
 		this.products = new ArrayList<IProduct>();
 	}
 
-	public int getWeight() { 
+	public int getProductsWeight() { 
 		int result = 0;
 		for (IProduct iProduct : products) {
 			result += iProduct.getWeight();
 		}
 		return result;
 	}
-	
-	public int size() { 
-		return products.size();
-	}
-	
+		
 	public boolean add(IProduct product) { 
 		if(products.size() < capacity) { 
-			products.add(product);
-			return true;
+			return products.add(product);
 		}
 		return false;
 	}

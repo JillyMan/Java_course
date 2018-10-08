@@ -1,6 +1,6 @@
 package com.products;
 
-import com.type_prod.IElectronic;
+import com.typeProd.IElectronic;
 
 public class Monitor implements IElectronic {
 	private int weight;

@@ -1,9 +1,9 @@
 import java.util.Random;
 
 public class GenaratorNumbers {
-	private Random random = new Random();
+	private static Random random = new Random();
 	
-	public int getRandom(int left, int right) { 		
+	public static int getRandom(int left, int right) { 		
 		return left + random.nextInt(right - left);		
 	}	
 }

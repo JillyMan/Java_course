@@ -1,4 +1,4 @@
-package com.type_prod;
+package com.typeProd;
 
 import com.IProduct;
 

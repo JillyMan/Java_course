@@ -1,6 +1,6 @@
 package com.products;
 
-import com.type_prod.IEatable;
+import com.typeProd.IEatable;
 
 public class Milk implements IEatable {
 	private int weight;
