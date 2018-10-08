@@ -1,4 +1,4 @@
-package com.storage;
+ackage com.storage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ public class Storage {
 	}
 		
 	public boolean add(IProduct product) { 
-		if(products.size() < capacity) { 
+		if(products.size() < getCapacity()) { 
 			return products.add(product);
 		}
 		return false;
