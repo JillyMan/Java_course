@@ -1,6 +1,6 @@
 package com.bookShop.dataAccessLayer;
 
-import com.bookShop.Order;
+import com.bookShop.businessObject.Order;
 import com.senla.training.FileWorker;
 import com.senla.training.TextFileWorker;
 import com.senla.training.example.FileUtil;

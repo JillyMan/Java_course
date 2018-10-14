@@ -1,4 +1,4 @@
-package com.bookShop;
+package com.bookShop.businessObject;
 
 import java.util.Date;
 
@@ -32,11 +32,11 @@ public class Book {
 		this.dateRelease = dataRelease;
 	}
 
-	public Boolean getOnStorage() {
+	public Boolean onStorage() {
 		return onStorage;
 	}
 
-	public void setOnStorage(Boolean onStorage) {
+	public void onStorage(Boolean onStorage) {
 		this.onStorage = onStorage;
 	}
 

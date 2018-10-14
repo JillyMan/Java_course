@@ -1,4 +1,4 @@
-package com.bookShop;
+package com.bookShop.businessObject;
 
 import java.util.Date;
 import java.util.List;
