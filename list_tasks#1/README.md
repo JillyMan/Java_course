@@ -1,1 +1,0 @@
-For run task *.xml need go to https://www.draw.io/ 
