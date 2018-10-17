@@ -4,13 +4,15 @@ import java.util.Date;
 
 public class Book {
 	private String name;
+	private Date dateReceipt;
 	private Date dateRelease;
 	private Boolean onStorage;
 	private Integer price;
 
-	public Book(String name, Date dateRelease, Boolean onStorage, Integer price) {
+	public Book(String name, Date dateReceipt, Date dateRelease, Boolean onStorage, Integer price) {
 		super();
 		this.name = name;
+		this.setDateReceipt(dateReceipt);
 		this.dateRelease = dateRelease;
 		this.onStorage = onStorage;
 		this.price = price;
@@ -51,5 +53,13 @@ public class Book {
 	public String toString() { 
 		return "Book [Name=" + name + ", DataRelease=" + 
 				dateRelease + ", OnStorage=" + onStorage + ", Price=" + price + "]";
+	}
+
+	public Date getDateReceipt() {
+		return dateReceipt;
+	}
+
+	public void setDateReceipt(Date dateReceipt) {
+		this.dateReceipt = dateReceipt;
 	}
 }

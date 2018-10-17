@@ -1,4 +1,4 @@
-package com.bookShop.dataAccessLayer;
+package com.bookShop.dataLayer;
 
 import com.bookShop.businessObject.Book;
 import com.senla.training.FileWorker;

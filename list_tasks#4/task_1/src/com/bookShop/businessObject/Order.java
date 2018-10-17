@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Order {	
 	
-	enum Status {
+	public enum Status {
 		AWAITING("Awaiting"),
 		COMPLEATE("Compleate"), 
 		CANCALED("Cancaled");
@@ -21,20 +21,29 @@ public class Order {
 		}		
 	}
 	
+	private Integer id;
 	private Date dateOrder;
 	private Date dateRelease;
-	private Integer price;
 	private List<Book> books;
 	private Status status;
 	
-	public Order(Date dateOrder, Date dateRelease, List<Book> books, Status status) {
+	public Order(Integer id, Date dateOrder, Date dateRelease, List<Book> books, Status status) {
 		super();
+		this.id = id;
 		this.dateOrder = dateOrder;
 		this.dateRelease = dateRelease;
 		this.books = books;
 		this.status = status;
 	}
 	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 	public Date getDateOrder() {
 		return dateOrder;
 	}
@@ -51,12 +60,11 @@ public class Order {
 		this.dateRelease = dateRelease;
 	}
 	
-	//TODO: it's useless!!! 
 	public Integer getPrice() {
-		for(int i = 0; i < books.size(); ++i) { 
-			price += books.get(i).getPrice();
-		}
-		
+		Integer price = 0;
+		for(Book b : books) { 
+			price += b.getPrice();
+		}		
 		return price;
 	}
 		
@@ -78,6 +86,6 @@ public class Order {
 	
 	public String toString() { 
 		return "Order [DataOrder=" + dateOrder + ", DateRelease=" + dateRelease + 
-				", Price=" + price + ", Books=" + books.toString() + ", Status=" + status.toString();
+				", Price=" + getPrice() + ", Books=" + books.toString() + ", Status=" + status.toString();
 	}	
 }
