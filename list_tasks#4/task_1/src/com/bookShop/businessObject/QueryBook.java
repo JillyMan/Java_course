@@ -29,7 +29,7 @@ public class QueryBook {
 	}
 	
 	public String toString() {
-		return "QueryOnBook [Count=" + count + ", IdBook=" + idBook;
+		return "QueryOnBook [Count=" + count + ", IdBook=" + idBook + "]";
 	}
 	
 }

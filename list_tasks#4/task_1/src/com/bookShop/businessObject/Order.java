@@ -66,11 +66,11 @@ public class Order {
 		this.dateRelease = dateRelease;
 	}
 	
-	public Integer getPrice() {
-		Integer price = 0; //books.stream().mapToInt(a -> a.getPrice()).sum();
+	public int getPrice() {
+		int price = 0; //books.stream().mapToInt(a -> a.getPrice()).sum();
 		for(Book b : books) { 
 			price += b.getPrice();
-		}		
+		}
 		return price;
 	}
 		
@@ -92,7 +92,7 @@ public class Order {
 	
 	public String toString() { 
 		return "Order [DataOrder=" + dateOrder + ", DateRelease=" + dateRelease + 
-				", Price=" + getPrice() + ", Books=" + books.toString() + ", Status=" + status.toString();
+				", Price=" + getPrice() + ", Books=" + books.toString() + ", Status=" + status.toString() + "]";
 	}	
 	
 }
