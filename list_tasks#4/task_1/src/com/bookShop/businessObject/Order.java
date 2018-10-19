@@ -6,19 +6,25 @@ import java.util.List;
 public class Order {	
 	
 	public enum Status {
-		AWAITING("Awaiting"),
-		COMPLEATE("Compleate"), 
-		CANCALED("Cancaled");
+		AWAITING("Awaiting", 1),
+		COMPLEATE("Compleate", 2),
+		CANCALED("Cancaled", 3);
 		
 		private final String name;
+		private final int value;
 		
-		private Status(String str) { 
+		private Status(String str, int value) { 
 			this.name = str;
+			this.value = value;
 		}
 		
 		public String toString() { 
 			return this.name;
 		}		
+		
+		public int toInt() { 
+			return value;
+		}
 	}
 	
 	private Integer id;
@@ -61,7 +67,7 @@ public class Order {
 	}
 	
 	public Integer getPrice() {
-		Integer price = 0;
+		Integer price = 0; //books.stream().mapToInt(a -> a.getPrice()).sum();
 		for(Book b : books) { 
 			price += b.getPrice();
 		}		
@@ -88,4 +94,5 @@ public class Order {
 		return "Order [DataOrder=" + dateOrder + ", DateRelease=" + dateRelease + 
 				", Price=" + getPrice() + ", Books=" + books.toString() + ", Status=" + status.toString();
 	}	
+	
 }

@@ -3,19 +3,27 @@ package com.bookShop.businessObject;
 import java.util.Date;
 
 public class Book {
+
+	private Integer id;
+	private Integer price;
 	private String name;
 	private Date dateReceipt;
 	private Date dateRelease;
-	private Boolean onStorage;
-	private Integer price;
 
-	public Book(String name, Date dateReceipt, Date dateRelease, Boolean onStorage, Integer price) {
-		super();
+	public Book(Integer id, String name, Date dateReceipt, Date dateRelease, Integer price) {
+		this.id = id;
 		this.name = name;
-		this.setDateReceipt(dateReceipt);
+		this.dateReceipt = dateReceipt;
 		this.dateRelease = dateRelease;
-		this.onStorage = onStorage;
 		this.price = price;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 	
 	public String getName() {
@@ -34,14 +42,6 @@ public class Book {
 		this.dateRelease = dataRelease;
 	}
 
-	public Boolean onStorage() {
-		return onStorage;
-	}
-
-	public void onStorage(Boolean onStorage) {
-		this.onStorage = onStorage;
-	}
-
 	public Integer getPrice() {
 		return price;
 	}
@@ -49,11 +49,6 @@ public class Book {
 	public void setPrice(Integer price) {
 		this.price = price;
 	}	
-		
-	public String toString() { 
-		return "Book [Name=" + name + ", DataRelease=" + 
-				dateRelease + ", OnStorage=" + onStorage + ", Price=" + price + "]";
-	}
 
 	public Date getDateReceipt() {
 		return dateReceipt;
@@ -62,4 +57,10 @@ public class Book {
 	public void setDateReceipt(Date dateReceipt) {
 		this.dateReceipt = dateReceipt;
 	}
+		
+	public String toString() { 
+		return "Book [Name=" + name + ", DataRelease=" + 
+				dateRelease + ", Price=" + price + "]";
+	}
+
 }
