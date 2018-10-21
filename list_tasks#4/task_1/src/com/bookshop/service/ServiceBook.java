@@ -1,12 +1,13 @@
-package com.bookShop.businessObject.serviceObject;
+package com.bookshop.service;
 
 import java.util.Comparator;
 import java.util.List;
 
-import com.bookShop.businessObject.Book;
-import com.bookShop.dataLayer.Storable;
-import com.bookShop.dataLayer.Storage;
-import com.bookShop.dataLayer.fileUtil.BookFileUtil;
+import com.bookshop.core.model.Book;
+import com.bookshop.dao.Storable;
+import com.bookshop.dao.Storage;
+import com.bookshop.dao.util.BookFileUtil;
+
 
 public class ServiceBook {
 	

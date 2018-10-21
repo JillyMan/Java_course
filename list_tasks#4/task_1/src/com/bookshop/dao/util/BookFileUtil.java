@@ -1,9 +1,9 @@
-package com.bookShop.dataLayer.fileUtil;
+package com.bookshop.dao.util;
 
-import com.bookShop.businessObject.Book;
 import com.senla.training.FileWorker;
 import com.senla.training.TextFileWorker;
 import com.senla.training.example.FileUtil;
+import com.bookshop.core.model.Book;
 
 public class BookFileUtil implements FileUtil<Book> {
 	
