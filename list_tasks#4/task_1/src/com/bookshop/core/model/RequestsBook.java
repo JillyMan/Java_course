@@ -1,6 +1,6 @@
 package com.bookshop.core.model;
 
-public class RequestsBook {			
+public class RequestsBook implements Identified<Integer>{			
 	
 	private final Integer idBook;
 	private Integer booksOnStorage;
@@ -28,10 +28,18 @@ public class RequestsBook {
 		this.queryOnBook = queryOnBook;
 	}
 
-	public Integer getIdBook() {
+	public Integer getId() {
 		return idBook;
 	}
 
+	public boolean equals(RequestsBook req) { 
+		boolean result = false;
+		if(getId() == req.getId()) { 
+			result = true;
+		}
+		return result;
+	}
+	
 	public String toString() {
 		return "QueryOnBook [IdBook=" + idBook + ", BookOnStorage=" + booksOnStorage + 
 				", QueryOnBook=" + "queryOnBook" + "]";

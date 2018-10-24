@@ -2,7 +2,7 @@ package com.bookshop.core.model;
 
 import java.util.Date;
 
-public class Book {
+public class Book implements Identified<Integer> {
 
 	private Integer id;
 	private Integer price;
@@ -11,12 +11,38 @@ public class Book {
 	private Date dateReceipt;
 	private Date dateRelease;
 
-	public Book(Integer id, Integer price, Author author, String title, Date dateReceipt, Date dateRelease) {
+	public Book(Integer id, Integer price, Author author, 
+			String title, Date dateReceipt, Date dateRelease) {
 		this.id = id;
 		this.title = title;
+		this.author = author;
 		this.dateReceipt = dateReceipt;
 		this.dateRelease = dateRelease;
 		this.price = price;
+	}
+	
+	public Author getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(Author author) {
+		this.author = author;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public Date getDateRelease() {
+		return dateRelease;
+	}
+
+	public void setDateRelease(Date dateRelease) {
+		this.dateRelease = dateRelease;
 	}
 
 	public Integer getId() {
@@ -27,14 +53,6 @@ public class Book {
 		this.id = id;
 	}
 	
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public Date getDataRelease() {
 		return dateRelease;
 	}
@@ -58,10 +76,18 @@ public class Book {
 	public void setDateReceipt(Date dateReceipt) {
 		this.dateReceipt = dateReceipt;
 	}
-		
+	
+	public boolean equals(Book book) { 
+		boolean result = false;
+		if(this.id == book.getId()) { 
+			result = true;
+		}
+		return result;
+	}
+	
 	public String toString() { 
-		return "Book [Name=" + name + ", DataRelease=" + 
-				dateRelease + ", Price=" + price + "]";
+		return "Book [ID =" + id + ", Price=" + price + ", Author=" + author + ", Title=" + title 
+				+ ", DataReceipt=" + dateReceipt + ", DateRelease=" + dateRelease + "]";
 	}
 
 }

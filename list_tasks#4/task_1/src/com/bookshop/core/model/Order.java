@@ -3,7 +3,7 @@ package com.bookshop.core.model;
 import java.util.Date;
 import java.util.List;
 
-public class Order {	
+public class Order implements Identified<Integer>{	
 	
 	public enum Status {
 		AWAITING("Awaiting", 1),
@@ -11,9 +11,9 @@ public class Order {
 		CANCALED("Cancaled", 3);
 		
 		private final String name;
-		private final int value;
+		private final Integer value;
 		
-		private Status(String str, int value) { 
+		private Status(String str, Integer value) { 
 			this.name = str;
 			this.value = value;
 		}
@@ -22,7 +22,7 @@ public class Order {
 			return this.name;
 		}		
 		
-		public int toInt() { 
+		public Integer toInt() { 
 			return value;
 		}
 	}
@@ -66,8 +66,8 @@ public class Order {
 		this.dateRelease = dateRelease;
 	}
 	
-	public int getPrice() {
-		int price = 0; //books.stream().mapToInt(a -> a.getPrice()).sum();
+	public Integer getPrice() {
+		Integer price = 0; //books.stream().mapToInt(a -> a.getPrice()).sum();
 		for(Book b : books) { 
 			price += b.getPrice();
 		}
@@ -89,6 +89,14 @@ public class Order {
 	public void setStatus(Status status) {
 		this.status = status;
 	}	
+	
+	public boolean equals(Order o) { 
+		boolean result = false;
+		if(this.id == o.getId()) { 
+			result = true;
+		}
+		return result;
+	}
 	
 	public String toString() { 
 		return "Order [DataOrder=" + dateOrder + ", DateRelease=" + dateRelease + 

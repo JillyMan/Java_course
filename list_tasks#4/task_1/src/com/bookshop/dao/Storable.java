@@ -7,4 +7,5 @@ public interface Storable<T> {
 	void update(T item);
 	boolean delete(T item);
 	List<T> getAll();
+	T getById(Integer id);
 }

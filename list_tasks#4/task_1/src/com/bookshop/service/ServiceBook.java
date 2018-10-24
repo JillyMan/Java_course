@@ -1,20 +1,30 @@
 package com.bookshop.service;
 
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
+import static com.bookshop.util.DateUtil.monthsBetween;
 import com.bookshop.core.model.Book;
+import com.bookshop.core.model.RequestsBook;
+import com.bookshop.dao.FactoryStorage;
 import com.bookshop.dao.Storable;
-import com.bookshop.dao.Storage;
-import com.bookshop.dao.util.BookFileUtil;
-
 
 public class ServiceBook {
 	
-	private final Storable<Book> storage = new Storage<Book>(new BookFileUtil("res/books.txt"));
+	private final Storable<Book> storage = FactoryStorage.getBookStorage();
 	
 	public ServiceBook() { 
 		
+	}
+	
+	public void add(Book book, int quantity) { 
+		Storable<RequestsBook> reqStore = FactoryStorage.getRequestBookStorage();
+		RequestsBook reqBook = reqStore.getById(book.getId());
+		reqBook.setBooksOnStorage(reqBook.getBooksOnStorage() + quantity);
+		storage.add(book);
+		reqStore.update(reqBook);
 	}
 	
 	public List<Book> getSortBy(Comparator<Book> comparator) { 
@@ -24,12 +34,12 @@ public class ServiceBook {
 	}
 
 	public List<Book> ancientBooks(Comparator<Book> comparator) { 
-		List<Book> result = storage.getAll();
+		List<Book> result = getSortBy(comparator);
 		result.removeIf((Book b) -> { 	
-			//TODO: get month between(b.getReceipt, Date.now());
-			return false;
+			Date now = Calendar.getInstance().getTime();
+			Date date = b.getDateReceipt();			
+			return (monthsBetween(date, now) > 6);			
 		});
-		result.sort(comparator);
 		return result;
 	}
 	
