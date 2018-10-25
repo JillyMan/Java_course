@@ -7,7 +7,11 @@ import com.senla.training.example.FileUtil;
 import jdk.internal.org.objectweb.asm.tree.analysis.Value;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -55,27 +59,57 @@ public class OrderFileUtil implements FileUtil<Order> {
 		if(entity == null) { 
 			throw new IllegalArgumentException();
 		}
-/*
-		private Integer id;
-		private Date dateOrder;
-		private Date dateRelease;
-		private List<Book> books;
-		private Status status;
-*/		
 
-		DateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy");
-		final String[] parts = new String[] {
+		DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
+
+		BookFileUtil bookUtil = new BookFileUtil("data/null.txt");
+		List<Book> books = entity.getBooks();
+		String[] strbook = new String[books.size()];
+		for(int i = 0; i < books.size(); ++i) { 
+			strbook[i] = bookUtil.toLine(books.get(i));
+		}
+		String lineBook = String.join("#", strbook);
+		
+		final String[] array = new String[] {
 			String.valueOf(entity.getId()),
 			dateFormat.format(entity.getDateOrder()),
 			dateFormat.format(entity.getDateRelease()),
-			
+			lineBook,
+			String.valueOf(entity.getStatus())
 		};
 		
-		return null;
+		return String.join(";", array);
 	}
 
 	public Order fromLine(String line) {
-		return null;
+		if(line == null || line.length() == 0) { 
+			throw new IllegalArgumentException();
+		}
+		
+		String[] parts = line.split(";");
+		DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
+		
+		BookFileUtil bookUtil = new BookFileUtil("data/null.txt");		
+		String[] lineBook = parts[3].split("#");
+		List<Book> books = new ArrayList<Book>();
+		for(int i = 0; i < lineBook.length; ++i) { 
+			books.add(bookUtil.fromLine(lineBook[i]));	
+		}		
+		
+		Order result = null;
+		try {
+			result = new Order(
+					Integer.valueOf(parts[0]),
+					dateFormat.parse(parts[1]),
+					dateFormat.parse(parts[2]),
+					books,
+					Order.Status.valueOf(parts[4]));
+
+		} catch (NumberFormatException | ParseException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 	
 }

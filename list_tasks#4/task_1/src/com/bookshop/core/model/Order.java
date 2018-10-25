@@ -1,14 +1,16 @@
 package com.bookshop.core.model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 public class Order implements Identified<Integer>{	
 	
 	public enum Status {
-		AWAITING("Awaiting", 1),
-		COMPLEATE("Compleate", 2),
-		CANCALED("Cancaled", 3);
+		AWAITING("AWAITING", 1),
+		COMPLEATE("COMPLEATE", 2),
+		CANCALED("CANCALED", 3);
 		
 		private final String name;
 		private final Integer value;
@@ -17,7 +19,7 @@ public class Order implements Identified<Integer>{
 			this.name = str;
 			this.value = value;
 		}
-		
+			
 		public String toString() { 
 			return this.name;
 		}		
@@ -99,7 +101,9 @@ public class Order implements Identified<Integer>{
 	}
 	
 	public String toString() { 
-		return "Order [DataOrder=" + dateOrder + ", DateRelease=" + dateRelease + 
+		DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
+
+		return "Order [DataOrder=" + dateOrder + ", DateRelease=" + dateFormat.format(dateRelease) + 
 				", Price=" + getPrice() + ", Books=" + books.toString() + ", Status=" + status.toString() + "]";
 	}	
 	

@@ -42,7 +42,7 @@ public class RequestsBook implements Identified<Integer>{
 	
 	public String toString() {
 		return "QueryOnBook [IdBook=" + idBook + ", BookOnStorage=" + booksOnStorage + 
-				", QueryOnBook=" + "queryOnBook" + "]";
+				", QueryOnBook=" + queryOnBook + "]";
 	}
 	
 }

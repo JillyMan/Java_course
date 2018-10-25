@@ -26,12 +26,12 @@ public class Author {
 	}
 	
 	public static Author valueOf(String line) { 
-		String[] result = line.split(":");	
+		String[] result = line.split(" ");	
 		return new Author(result[0], result[1]);
 	}
 	
 	public String toString() {
-		return firstName + ":" + lastName;
+		return firstName + " " + lastName;
 	}
 	
 }

@@ -57,18 +57,18 @@ public class BookFileUtil implements FileUtil<Book> {
 		if (book == null) {
 			throw new IllegalArgumentException();
 		}
-		DateFormat date = new SimpleDateFormat("MMMM d, yyyy");
+		DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
 		
 		final String[] array = new String[] { 
 				String.valueOf(book.getId()), 
 				String.valueOf(book.getPrice()),
 				String.valueOf(book.getAuthor()),
 				book.getTitle(),
-				date.format(book.getDateReceipt()),
-				date.format(book.getDateRelease()),
+				dateFormat.format(book.getDateReceipt()),
+				dateFormat.format(book.getDateRelease()),
 		};
 
-		return String.join(";", array);
+		return String.join("@", array);
 	}
 
 	public Book fromLine(String line) {
@@ -76,8 +76,8 @@ public class BookFileUtil implements FileUtil<Book> {
 			return null;
 		}
 
-		final String[] parts = line.split(";");
-		DateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy");
+		final String[] parts = line.split("@");
+		DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
 		Book result = null;
 		try {
 			result = new Book(

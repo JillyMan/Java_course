@@ -1,5 +1,7 @@
 package com.bookshop.core.model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Book implements Identified<Integer> {
@@ -86,8 +88,10 @@ public class Book implements Identified<Integer> {
 	}
 	
 	public String toString() { 
+		DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
+
 		return "Book [ID =" + id + ", Price=" + price + ", Author=" + author + ", Title=" + title 
-				+ ", DataReceipt=" + dateReceipt + ", DateRelease=" + dateRelease + "]";
+				+ ", DataReceipt=" + dateFormat.format(dateReceipt) + ", DateRelease=" + dateFormat.format(dateRelease) + "]";
 	}
 
 }
