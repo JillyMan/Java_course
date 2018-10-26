@@ -2,8 +2,6 @@ package com.bookshop.core.comparator;
 
 import java.util.Comparator;
 
-import com.bookshop.core.comparator.BookComparators.Type;
-import com.bookshop.core.model.Book;
 import com.bookshop.core.model.Order;
 
 public class OrderComparators {

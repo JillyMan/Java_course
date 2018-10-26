@@ -8,9 +8,9 @@ public class BookComparators {
 	
 	public enum Type {
 		NAME,
-		DATE, 
-		PRICE, 
-		ONSTORAGE
+		DATERELEASE,
+		DATERECEIPT,
+		PRICE
 	}
 	
 	public static Comparator<Book> getComparator(Type type) { 
@@ -20,15 +20,13 @@ public class BookComparators {
 		case NAME:  
 			result = (Book a, Book b) -> a.getTitle().compareTo(b.getTitle());
 			break;
-		case DATE:
+		case DATERELEASE:
 			result = (Book a, Book b) -> a.getDataRelease().compareTo(b.getDateRelease());
 			break;
+		case DATERECEIPT:
+			result = (Book a, Book b) -> a.getDateReceipt().compareTo(b.getDataRelease());
 		case PRICE:
 			result = (Book a, Book b) -> a.getPrice().compareTo(b.getPrice());
-			break;
-		case ONSTORAGE: 
-			//TODO: ???
-			result = null;
 			break;
 		default: 
 			break;

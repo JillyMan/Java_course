@@ -1,18 +1,17 @@
 package com.bookshop.dao.util;
 
-import com.senla.training.FileWorker;
-import com.senla.training.TextFileWorker;
-import com.senla.training.example.FileUtil;
-import com.senla.training.example.Man;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import com.bookshop.core.model.Author;
 import com.bookshop.core.model.Book;
-import com.bookshop.core.model.Order;
+import com.textfileworker.FileUtil;
+import com.textfileworker.FileWorker;
+import com.textfileworker.TextFileWorker;
 
 public class BookFileUtil implements FileUtil<Book> {
 	
@@ -22,33 +21,33 @@ public class BookFileUtil implements FileUtil<Book> {
 		fileWorker = new TextFileWorker(path);
 	}
 	
-	public Book[] readFromFile() {
+	public List<Book> readFromFile() {
 		
-		final String[] lines = fileWorker.readFromFile();
+		List<String> lines = fileWorker.readFromFile();
 		
-		if (lines == null || lines.length == 0) {
+		if (lines == null || lines.size() == 0) {
 			throw new IllegalArgumentException();
 		}
 
-		final Book[] result = new Book[lines.length];
+		final List<Book> result = new ArrayList<Book>();
 
-		for (int i = 0; i < lines.length; i++) {
-			result[i] = fromLine(lines[i]);
+		for(String line : lines) { 
+			result.add(fromLine(line));
 		}
-		
+
 		return result;
 	}
 
-	public void writeToFile(Book[] values) {
-		if(values == null || values.length == 0) { 
+	public void writeToFile(Collection<Book> values) {
+		if(values == null || values.size() == 0) { 
 			throw new IllegalArgumentException();
 		}
 		
-		final String[] result = new String[values.length];
-		
-		for(int i = 0; i < result.length; ++i) { 
-			result[i] = toLine(values[i]);
-		}
+		final List<String> result = new ArrayList<String>();
+
+		for(Book book : values) { 
+			result.add(toLine(book));
+		}		
 		
 		fileWorker.writeToFile(result);
 	}
@@ -93,4 +92,5 @@ public class BookFileUtil implements FileUtil<Book> {
 		
 		return result;
 	}
+	
 }

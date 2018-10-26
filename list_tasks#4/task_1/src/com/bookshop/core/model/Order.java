@@ -35,12 +35,15 @@ public class Order implements Identified<Integer>{
 	private List<Book> books;
 	private Status status;
 	
-	public Order(Integer id, Date dateOrder, Date dateRelease, List<Book> books, Status status) {
-		super();
+	public Order(Integer id, Date dateOrder, Date dateRelease, List<Book> books) { 
 		this.id = id;
 		this.dateOrder = dateOrder;
 		this.dateRelease = dateRelease;
-		this.books = books;
+		this.books = books;		
+	}
+
+	public Order(Integer id, Date dateOrder, Date dateRelease, List<Book> books, Status status) {
+		this(id, dateOrder, dateRelease, books);
 		this.status = status;
 	}
 	
@@ -92,9 +95,13 @@ public class Order implements Identified<Integer>{
 		this.status = status;
 	}	
 	
-	public boolean equals(Order o) { 
+	public int hashCode() { 
+		return id.hashCode();
+	}
+	
+	public boolean equals(Object o) { 
 		boolean result = false;
-		if(this.id == o.getId()) { 
+		if(this.id == ((Order)o).getId()) { 
 			result = true;
 		}
 		return result;
@@ -103,7 +110,7 @@ public class Order implements Identified<Integer>{
 	public String toString() { 
 		DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
 
-		return "Order [DataOrder=" + dateOrder + ", DateRelease=" + dateFormat.format(dateRelease) + 
+		return "Order [ID=" + id + ", DataOrder=" + dateOrder + ", DateRelease=" + dateFormat.format(dateRelease) + 
 				", Price=" + getPrice() + ", Books=" + books.toString() + ", Status=" + status.toString() + "]";
 	}	
 	

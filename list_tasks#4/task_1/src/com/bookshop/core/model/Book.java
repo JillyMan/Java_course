@@ -79,15 +79,20 @@ public class Book implements Identified<Integer> {
 		this.dateReceipt = dateReceipt;
 	}
 	
-	public boolean equals(Book book) { 
+	public boolean equals(Object book) { 
 		boolean result = false;
-		if(this.id == book.getId()) { 
+		if(this.id == ((Book)book).getId()) { 
 			result = true;
 		}
 		return result;
 	}
 	
+	public int hashCode() {
+		return id.hashCode();
+	}
+	
 	public String toString() { 
+		
 		DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
 
 		return "Book [ID =" + id + ", Price=" + price + ", Author=" + author + ", Title=" + title 

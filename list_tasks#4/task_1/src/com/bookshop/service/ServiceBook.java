@@ -13,7 +13,7 @@ import com.bookshop.dao.Storable;
 
 public class ServiceBook {
 	
-	private final Storable<Book> storage = FactoryStorage.getBookStorage();
+	private final Storable<Book> connector = FactoryStorage.getBookStorage();
 	
 	public ServiceBook() { 
 		
@@ -23,22 +23,22 @@ public class ServiceBook {
 		Storable<RequestsBook> reqStore = FactoryStorage.getRequestBookStorage();
 		RequestsBook reqBook = reqStore.getById(book.getId());
 		reqBook.setBooksOnStorage(reqBook.getBooksOnStorage() + quantity);
-		storage.add(book);
+		connector.add(book);
 		reqStore.update(reqBook);
 	}
 	
-	public List<Book> getSortBy(Comparator<Book> comparator) { 
-		List<Book> result = storage.getAll();
+	public List<Book> sortBy(Comparator<Book> comparator) { 
+		List<Book> result = connector.getAll();
 		result.sort(comparator);
 		return result;
 	}
 
 	public List<Book> ancientBooks(Comparator<Book> comparator) { 
-		List<Book> result = getSortBy(comparator);
+		List<Book> result = sortBy(comparator);
 		result.removeIf((Book b) -> { 	
 			Date now = Calendar.getInstance().getTime();
-			Date date = b.getDateReceipt();			
-			return (monthsBetween(date, now) > 6);			
+			Date date = b.getDateReceipt();	
+			return !(monthsBetween(date, now) > 6);			
 		});
 		return result;
 	}

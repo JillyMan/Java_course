@@ -1,23 +1,17 @@
 package com.bookshop.dao.util;
 
-import com.senla.training.FileWorker;
-import com.senla.training.TextFileWorker;
-import com.senla.training.example.FileUtil;
-
-import jdk.internal.org.objectweb.asm.tree.analysis.Value;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import com.bookshop.core.model.Book;
 import com.bookshop.core.model.Order;
-import com.bookshop.core.model.Order.Status;
+import com.textfileworker.FileUtil;
+import com.textfileworker.FileWorker;
+import com.textfileworker.TextFileWorker;
 
 public class OrderFileUtil implements FileUtil<Order> {
 
@@ -27,32 +21,35 @@ public class OrderFileUtil implements FileUtil<Order> {
 		fileWorker = new TextFileWorker(path);
 	}
 
-	public Order[] readFromFile() {
-		final String[] lines = fileWorker.readFromFile();
+	public List<Order> readFromFile() {
 		
-		if (lines == null || lines.length == 0) {
+		List<String> lines = fileWorker.readFromFile();
+		
+		if (lines == null || lines.size() == 0) {
 			throw new IllegalArgumentException();
 		}
-		
-		final Order[] result = new Order[lines.length];
 
-		for (int i = 0; i < lines.length; i++) {
-			result[i] = fromLine(lines[i]);
+		final List<Order> result = new ArrayList<Order>();
+
+		for(String line : lines) { 
+			result.add(fromLine(line));
 		}
-		
+
 		return result;
 	}
 
-	public void writeToFile(Order[] values) {		
-		if(values == null || values.length == 0) { 
+	public void writeToFile(Collection<Order> values) {
+		if(values == null || values.size() == 0) { 
 			throw new IllegalArgumentException();
 		}
 		
-		final String[] lines = new String[values.length];
-		for (int i = 0; i < values.length; i++) {
-			lines[i] = toLine(values[i]);
-		}
-		fileWorker.writeToFile(lines);
+		final List<String> result = new ArrayList<String>();
+
+		for(Order order: values) { 
+			result.add(toLine(order));
+		}		
+		
+		fileWorker.writeToFile(result);
 	}
 
 	public String toLine(Order entity) {
@@ -104,7 +101,6 @@ public class OrderFileUtil implements FileUtil<Order> {
 					dateFormat.parse(parts[2]),
 					books,
 					Order.Status.valueOf(parts[4]));
-
 		} catch (NumberFormatException | ParseException e) {
 			e.printStackTrace();
 		}

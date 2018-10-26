@@ -10,8 +10,8 @@ import com.bookshop.dao.util.RequestBookFileUtil;
 public class FactoryStorage {
 
 	private static final Storable<Book> bookStorage = new Storage<Book>(new BookFileUtil("data/books.txt"));
-	private static final Storage<Order> orderStorage = new Storage<Order>(new OrderFileUtil("data/orders.txt"));
-	private static final Storage<RequestsBook> requestBookStorage = 
+	private static final Storable<Order> orderStorage = new Storage<Order>(new OrderFileUtil("data/orders.txt"));
+	private static final Storable<RequestsBook> requestBookStorage = 
 			new Storage<RequestsBook>(new RequestBookFileUtil("data/requestsBook.txt"));
 
 	public static Storable<Book> getBookStorage() { 

@@ -1,37 +1,35 @@
 package com.bookshop.service;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
 import com.bookshop.core.model.Book;
 import com.bookshop.core.model.RequestsBook;
-import com.bookshop.dao.Storage;
-import com.bookshop.dao.util.RequestBookFileUtil;
+import com.bookshop.dao.FactoryStorage;
+import com.bookshop.dao.Storable;
 
 public class ServiceRequestBook {
 	
-	private final Storage<RequestsBook> storage = 
-			new Storage<RequestsBook>(new RequestBookFileUtil("data/requestsBook.txt"));
+	private final Storable<RequestsBook> connector = FactoryStorage.getRequestBookStorage();
 
 	public ServiceRequestBook() { 
 		
 	} 
 	
 	public void deregister(Book book, int quantity) { 
-		RequestsBook req = storage.getById(book.getId());
+		RequestsBook req = connector.getById(book.getId());
 		req.setBooksOnStorage(req.getBooksOnStorage() - quantity);
-		storage.update(req);					
+		connector.update(req);					
 	}
 	
 	public void makeRequest(Book book) { 
-		RequestsBook req = storage.getById(book.getId());
+		RequestsBook req = connector.getById(book.getId());
 		req.setQueryOnBook(req.getQueryOnBook() + 1);
-		storage.update(req);
+		connector.update(req);
 	}
 	
 	public List<RequestsBook> sortBy(Comparator<RequestsBook> comparator) { 
-		List<RequestsBook> result = storage.getAll();
+		List<RequestsBook> result = connector.getAll();
 		result.sort(comparator);
 		return result;
 	}
