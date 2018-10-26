@@ -103,7 +103,10 @@ public class Program {
 	}	
 	
 	@SuppressWarnings("deprecation")
-	public static void main(String[] args) throws ParseException { 
+	public static void main(String[] args) throws ParseException {
+		if(args.length == 3) { 
+			
+		}
 		System.out.println("Fill data\n-----------");
 		fillFileBooks();
 		fillFileOrder();
