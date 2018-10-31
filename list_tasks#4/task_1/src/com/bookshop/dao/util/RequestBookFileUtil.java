@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.bookshop.core.model.Book;
 import com.bookshop.core.model.RequestsBook;
+import com.bookshop.dao.StorageFactory;
 import com.textfileworker.FileUtil;
 import com.textfileworker.FileWorker;
 import com.textfileworker.TextFileWorker;
@@ -14,7 +15,8 @@ import com.textfileworker.TextFileWorker;
 public class RequestBookFileUtil implements FileUtil<RequestsBook>{
 
 	private final FileWorker fileWorker;
-
+	private BookFileUtil bookParser = new BookFileUtil("empty.txt");
+	
 	public RequestBookFileUtil(String path) { 
 		fileWorker = new TextFileWorker(path);
 	}
@@ -54,13 +56,9 @@ public class RequestBookFileUtil implements FileUtil<RequestsBook>{
 		if(entity == null ) { 
 			throw new IllegalArgumentException();
 		}
-
-		BookFileUtil bookUtil = new BookFileUtil("data/null.txt");
-		Book book = entity.getBook();
-		String line = bookUtil.toLine(book);
-				
+			
 		final String[] array = new String[] { 
-			line,
+			String.valueOf(entity.getId()),
 			String.valueOf(entity.getQueryOnBook()),
 			String.valueOf(entity.getBooksOnStorage())
 		};
@@ -73,13 +71,16 @@ public class RequestBookFileUtil implements FileUtil<RequestsBook>{
 			throw new IllegalArgumentException();
 		}
 		
-		BookFileUtil bookUtil = new BookFileUtil("data/null.txt");
 		final String[] parts = line.split(";");
-
-		final RequestsBook result = new RequestsBook(
-				bookUtil.fromLine(parts[0]),
-				Integer.valueOf(parts[1]), 
-				Integer.valueOf(parts[2]));
+				
+		Book book = StorageFactory.getInstance().getBookStorage().getById(Integer.valueOf(parts[0]));
+		if(book == null) { 
+			throw new RuntimeException("Book by id" + parts[0] + " not found");
+		}
+		final RequestsBook result = new RequestsBook();
+		result.setBook(book);
+		result.setQueryOnBook(Integer.valueOf(parts[1]));
+		result.setBooksOnStorage(Integer.valueOf(parts[2]));
 		return result;
 	}
 

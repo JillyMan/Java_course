@@ -1,105 +1,87 @@
 package com.bookshop.service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.bookshop.core.model.Book;
 import com.bookshop.core.model.Order;
 import com.bookshop.core.model.Order.Status;
 import com.bookshop.core.model.RequestsBook;
-import com.bookshop.dao.FactoryStorage;
 import com.bookshop.dao.Storable;
+import com.bookshop.dao.StorageFactory;
 
 public class ServiceOrder {
 	
-	private final Storable<Order> connector = FactoryStorage.getOrderStorage();
+	private final Storable<Order> connector = StorageFactory.getInstance().getOrderStorage();
 	
 	public ServiceOrder() { 
 		
 	}
 	
-	public void add(Order order) { 
+	public void add(Order order) {
+		if(order == null) { 
+			throw new IllegalArgumentException("Order has value null");			
+		}
 		order.setStatus(Order.Status.AWAITING);
 		connector.add(order);	
 		
-		Storable<RequestsBook> reqStore = FactoryStorage.getRequestBookStorage();			
-		List<RequestsBook> requests = getRequestsByOrder(order, reqStore);
-
-		if(order.getBooks().size() == requests.size()) { 
-			requests.forEach((RequestsBook req) -> {
-				req.setQueryOnBook(req.getQueryOnBook() + 1);
-				reqStore.update(req);
-			});
-		}
+		ServiceRequestBook reqSevice = new ServiceRequestBook();
+		Map<Book, Integer> bookCount = order.getBooksCount();
+		bookCount.forEach((book, count) -> reqSevice.makeRequest(book, bookCount.get(book)));
 	}
 		
-	public void close(Order order) {
-		if(order.getStatus().equals(Status.COMPLEATE)) {
-			System.err.println("Order compleate!!!");
-			return;
+	public void cancel(Order order) {
+		if(order == null) {
+			throw new IllegalArgumentException("Order has value null");
+		} else if(!order.getStatus().equals(Status.AWAITING)) {
+			System.err.println("Order now" + order.getStatus() + " !!!!");
+			throw new RuntimeException("Order has status " + order.getStatus());
 		}
+
 		order.setStatus(Order.Status.CANCALED);
-		connector.update(order);
 
-		Storable<RequestsBook> reqStore = FactoryStorage.getRequestBookStorage();	
-		List<RequestsBook> requests = getRequestsByOrder(order, reqStore);
+		ServiceRequestBook reqSevice = new ServiceRequestBook();
+		Map<Book, Integer> bookCount = order.getBooksCount();
+		bookCount.forEach((book, count) -> reqSevice.removeRequest(book, bookCount.get(book)));
 		
-		if(order.getBooks().size() == requests.size()) { 
-			requests.forEach((RequestsBook req) -> {
-				req.setQueryOnBook(req.getQueryOnBook() - 1);
-				reqStore.update(req);
-			});
-		}		
-	}
-	
-	private List<RequestsBook> getRequestsByOrder(Order order, Storable<RequestsBook> reqStore) { 
-		List<RequestsBook> requests = reqStore.getAll()
-		.stream()
-		.filter((RequestsBook req) -> {
-			for(Book book : order.getBooks()) {
-				if(book.getId() == req.getId()) {
-					return true;
-				}
-			}
-			return false;
-		})
-		.collect(Collectors.toList());		
-		return requests;
+		connector.update(order);
 	}
 
-	
 	public boolean equip(Order order) { 
 		boolean result = false;
 		if(!order.getStatus().equals(Status.AWAITING)) { 
-			System.err.println("Order not awaiting!!!");
-			return result;
+			throw new IllegalArgumentException();
 		}
-		Storable<RequestsBook> reqStore = FactoryStorage.getRequestBookStorage();	
 		
-		List<RequestsBook> requests = reqStore.getAll();
-		requests = requests.stream()
-			.filter((RequestsBook req) -> {
-				for(Book book : order.getBooks()) {
-					if(book.getId() == req.getId() && req.getBooksOnStorage() > 0) {
-						return true;
-					}
-				}
-				return false;
-			}).collect(Collectors.toList());
-
-		if(order.getBooks().size() == requests.size()) { 
-			result = true;
-			requests.forEach((RequestsBook req) -> {
-				req.setQueryOnBook(req.getQueryOnBook() - 1);
-				req.setBooksOnStorage(req.getBooksOnStorage() - 1);			
-				reqStore.update(req);
-			});
-			order.setStatus(Order.Status.COMPLEATE);
-			connector.update(order);
+		Storable<RequestsBook> requestConnector = StorageFactory.getInstance().getRequestBookStorage();
+		ServiceRequestBook serviceReq = new ServiceRequestBook();
+		Map<Book, Integer> booksCount = order.getBooksCount();	
+		List<RequestsBook> requests = new ArrayList<RequestsBook>();
+		
+		booksCount.keySet().forEach(book -> requests.add(requestConnector.getById(book.getId())));
+				
+		if(booksCount.size() == requests.size()) { 			
+			result = requests.stream()
+				.allMatch((req) ->  {
+					return req.getBooksOnStorage() >= booksCount.get(req.getBook());
+				});
+			if(result) { 
+				requests.forEach((req) -> {
+					int needBook = booksCount.get(req.getBook());
+					serviceReq.deregisterBook(req.getBook(), needBook);
+					serviceReq.removeRequest(req.getBook(), needBook);					
+				});
+				order.setStatus(Order.Status.COMPLETED);
+				connector.update(order);
+			}
 		}
-	
+		
 		return result;
 	}
 	
@@ -110,10 +92,13 @@ public class ServiceOrder {
 				.collect(Collectors.toList());
 	}
 	
-	public List<Order> getCompleateForPeriod(Date min, Date max) { 
+	public List<Order> getCompleateForPeriod(Date min, Date max) {
+		if(min == null || max == null) { 
+			throw new IllegalArgumentException();
+		}
 		List<Order> result = connector.getAll();
 		result.removeIf((Order o) -> { 	
-			if(o.getStatus() == Order.Status.COMPLEATE) { 
+			if(o.getStatus() == Order.Status.COMPLETED) { 
 				return !(o.getDateRelease().before(min) || o.getDateRelease().after(max));				
 			}
 			return false;

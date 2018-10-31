@@ -1,3 +1,3 @@
 @echo off
-java -cp fileUtil.jar -jar program.jar filePath.properties 
+java -cp ../dependency/fileUtil.jar -jar ../dependency/program.jar filePath.properties 
 pause

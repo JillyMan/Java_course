@@ -13,6 +13,10 @@ public class Book implements Identified<Integer> {
 	private Date dateReceipt;
 	private Date dateRelease;
 
+	private DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
+	
+	public Book() {}
+	
 	public Book(Integer id, Integer price, Author author, 
 			String title, Date dateReceipt, Date dateRelease) {
 		this.id = id;
@@ -79,22 +83,48 @@ public class Book implements Identified<Integer> {
 		this.dateReceipt = dateReceipt;
 	}
 	
-	public boolean equals(Object book) { 
-		boolean result = false;
-		if(this.id == ((Book)book).getId()) { 
-			result = true;
-		}
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((author == null) ? 0 : author.hashCode());
+		result = prime * result + ((dateRelease == null) ? 0 : dateRelease.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
-	
-	public int hashCode() {
-		return id.hashCode();
-	}
-	
-	public String toString() { 
-		
-		DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
 
+	public boolean equals(Object obj) {
+		if (this == obj) 
+			return true;			
+		if (obj == null) 
+			return false;			
+		if (getClass() != obj.getClass())
+			return false;
+		Book other = (Book) obj;
+		if (author == null) {
+			if (other.author != null)
+				return false;
+		} else if (!author.equals(other.author))
+			return false;
+		if (dateRelease == null) {
+			if (other.dateRelease != null)
+				return false;
+		} else if (!dateRelease.equals(other.dateRelease))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		return true;
+	}
+
+	public String toString() { 
 		return "Book [ID =" + id + ", Price=" + price + ", Author=" + author + ", Title=" + title 
 				+ ", DataReceipt=" + dateFormat.format(dateReceipt) + ", DateRelease=" + dateFormat.format(dateRelease) + "]";
 	}

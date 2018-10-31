@@ -16,6 +16,7 @@ import com.textfileworker.TextFileWorker;
 public class BookFileUtil implements FileUtil<Book> {
 	
 	private final FileWorker fileWorker;
+	private final DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
 	
 	public BookFileUtil (String path) { 
 		fileWorker = new TextFileWorker(path);
@@ -76,16 +77,15 @@ public class BookFileUtil implements FileUtil<Book> {
 		}
 
 		final String[] parts = line.split("@");
-		DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
 		Book result = null;
 		try {
-			result = new Book(
-				Integer.valueOf(parts[0]),
-				Integer.valueOf(parts[1]),
-				Author.valueOf(parts[2]), 
-				parts[3],			
-				dateFormat.parse(parts[4]),
-				dateFormat.parse(parts[5]));
+			result = new Book();
+			result.setId(Integer.valueOf(parts[0]));
+			result.setPrice(Integer.valueOf(parts[1]));
+			result.setAuthor(Author.valueOf(parts[2])); 
+			result.setTitle(parts[3]);			
+			result.setDateReceipt(dateFormat.parse(parts[4]));
+			result.setDataRelease(dateFormat.parse(parts[5]));			
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}

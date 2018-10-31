@@ -1,7 +1,9 @@
 package com.bookshop.dao;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.bookshop.core.model.Identified;
 import com.textfileworker.FileUtil;
@@ -15,27 +17,37 @@ public class Storage<T extends Identified<Integer>> implements Storable<T> {
 	}
 	
 	public void add(T item) {
-		HashSet<T> set = new HashSet<T>(getAll());
+		Set<T> set = new HashSet<T>(getAll());
 		if(set.add(item)) {
 			fileUtil.writeToFile(set);	
 		}
 	}
-
+ 
 	public void update(T item) {
-		List<T> list = getAll(); 
-		int index = list.indexOf(item);
-		if(index >= 0) { 
-			list.set(index, item);			
+		if(item != null) {			
+			Set<T> set = new HashSet<T>(getAll()); 
+			T element = set.stream()
+				.filter(x -> x.getId() == item.getId())
+				.findFirst()
+				.orElseThrow(() -> new  RuntimeException("Item: " + item + " not found"));
+			set.remove(element);
+			if(set.add(item)) { 
+				fileUtil.writeToFile(set);											
+			}
+		} else {
+			throw new IllegalArgumentException("Item == null");
 		}
-		fileUtil.writeToFile(list);
 	}
 	
 	public boolean delete(T item) {
-		List<T> list = getAll();
+		if(item == null) {
+			throw new IllegalArgumentException("Item == null");
+		}
+		List<T> list = new ArrayList<T>(getAll());
 		boolean result = list.remove(item);
 		if(result) { 
 			fileUtil.writeToFile(list);			
-		}
+		} 
 		return result;
 	}
 
@@ -44,10 +56,10 @@ public class Storage<T extends Identified<Integer>> implements Storable<T> {
 	}
 
 	public T getById(Integer id) {
-		List<T> list = getAll();
-		return 	list.stream()
-				.filter((T t) -> t.getId().equals(id))
-				.findFirst().get();
+		return 	getAll().stream()
+				.filter(item -> item.getId().equals(id))
+				.findFirst()
+				.orElseThrow(() -> new  RuntimeException("Item with id = " + id + " not found"));
 	}
 	
 }

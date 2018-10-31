@@ -1,14 +1,19 @@
 package com.bookshop.dao.util;
 
 import java.text.DateFormat;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.bookshop.core.model.Book;
 import com.bookshop.core.model.Order;
+import com.bookshop.dao.Storable;
+import com.bookshop.dao.StorageFactory;
 import com.textfileworker.FileUtil;
 import com.textfileworker.FileWorker;
 import com.textfileworker.TextFileWorker;
@@ -16,7 +21,8 @@ import com.textfileworker.TextFileWorker;
 public class OrderFileUtil implements FileUtil<Order> {
 
 	private final FileWorker fileWorker;
-	
+	private final DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
+
 	public OrderFileUtil(String path) { 
 		fileWorker = new TextFileWorker(path);
 	}
@@ -56,22 +62,15 @@ public class OrderFileUtil implements FileUtil<Order> {
 		if(entity == null) { 
 			throw new IllegalArgumentException();
 		}
-
-		DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
-
-		BookFileUtil bookUtil = new BookFileUtil("data/null.txt");
-		List<Book> books = entity.getBooks();
-		String[] strbook = new String[books.size()];
-		for(int i = 0; i < books.size(); ++i) { 
-			strbook[i] = bookUtil.toLine(books.get(i));
-		}
-		String lineBook = String.join("#", strbook);
+		
+		Map<Integer, Integer> idBookCount = new HashMap<Integer, Integer>();	
+		entity.getBooksCount().forEach((book, count) -> idBookCount.put(book.getId(), count));
 		
 		final String[] array = new String[] {
 			String.valueOf(entity.getId()),
 			dateFormat.format(entity.getDateOrder()),
 			dateFormat.format(entity.getDateRelease()),
-			lineBook,
+			idBookCount.toString(),
 			String.valueOf(entity.getStatus())
 		};
 		
@@ -84,27 +83,34 @@ public class OrderFileUtil implements FileUtil<Order> {
 		}
 		
 		String[] parts = line.split(";");
-		DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
-		
-		BookFileUtil bookUtil = new BookFileUtil("data/null.txt");		
-		String[] lineBook = parts[3].split("#");
-		List<Book> books = new ArrayList<Book>();
-		for(int i = 0; i < lineBook.length; ++i) { 
-			books.add(bookUtil.fromLine(lineBook[i]));	
-		}		
 		
 		Order result = null;
-		try {
-			result = new Order(
-					Integer.valueOf(parts[0]),
-					dateFormat.parse(parts[1]),
-					dateFormat.parse(parts[2]),
-					books,
-					Order.Status.valueOf(parts[4]));
-		} catch (NumberFormatException | ParseException e) {
-			e.printStackTrace();
+		Map<Book, Integer> map = new HashMap<Book, Integer>();
+		String[] mapValue = parts[3].split("\\D");
+		
+		Storable<Book> storeBook = StorageFactory.getInstance().getBookStorage();
+		
+		for(int i = 0; i < mapValue.length - 1; i++) { 
+			if(!mapValue[i].equals("")) {
+				Book book = storeBook.getById(Integer.valueOf(mapValue[i]));
+				if(book == null) { 
+					throw new RuntimeException("Book by id = " + mapValue[i] + " not found");
+				}
+				map.put(book, Integer.valueOf(mapValue[i+1]));				
+				i++;
+			}
 		}
 		
+		try {
+			result = new Order();			
+			result.setId(Integer.valueOf(parts[0]));
+			result.setDateOrder(dateFormat.parse(parts[1]));
+			result.setDateRelease(dateFormat.parse(parts[2]));
+			result.setIdCountBooks(map);
+			result.setStatus(Order.Status.valueOf(parts[4]));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}		
 		return result;
 	}
 	

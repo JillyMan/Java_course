@@ -25,6 +25,7 @@ public class BookComparators {
 			break;
 		case DATERECEIPT:
 			result = (Book a, Book b) -> a.getDateReceipt().compareTo(b.getDataRelease());
+			break;
 		case PRICE:
 			result = (Book a, Book b) -> a.getPrice().compareTo(b.getPrice());
 			break;

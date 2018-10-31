@@ -1,30 +1,47 @@
 package com.bookshop.service;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
 import static com.bookshop.util.DateUtil.monthsBetween;
 import com.bookshop.core.model.Book;
+import com.bookshop.core.model.Order;
 import com.bookshop.core.model.RequestsBook;
-import com.bookshop.dao.FactoryStorage;
 import com.bookshop.dao.Storable;
+import com.bookshop.dao.StorageFactory;
 
 public class ServiceBook {
 	
-	private final Storable<Book> connector = FactoryStorage.getBookStorage();
+	private final Storable<Book> connector = StorageFactory.getInstance().getBookStorage();
 	
 	public ServiceBook() { 
 		
 	}
 	
 	public void add(Book book, int quantity) { 
-		Storable<RequestsBook> reqStore = FactoryStorage.getRequestBookStorage();
+		Storable<RequestsBook> reqStore = StorageFactory.getInstance().getRequestBookStorage();
 		RequestsBook reqBook = reqStore.getById(book.getId());
-		reqBook.setBooksOnStorage(reqBook.getBooksOnStorage() + quantity);
+		if(reqBook == null) { 
+			reqBook = new RequestsBook(book, 0, quantity);
+			reqStore.add(reqBook);
+		}
+		else { 
+			reqBook.setBooksOnStorage(reqBook.getBooksOnStorage() + quantity);
+			reqStore.update(reqBook);
+		}
 		connector.add(book);
-		reqStore.update(reqBook);
+	}
+	
+	public List<Book> getBooksByOrder(Order order) { 
+		List<Book> result = new ArrayList<Book>();
+		for (Book book : order.getBooks()) {
+			result.add(connector.getById(book.getId()));
+		}
+		return result;
 	}
 	
 	public List<Book> sortBy(Comparator<Book> comparator) { 

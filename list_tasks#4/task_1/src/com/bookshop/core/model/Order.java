@@ -3,13 +3,16 @@ package com.bookshop.core.model;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Order implements Identified<Integer>{	
 	
 	public enum Status {
 		AWAITING("AWAITING", 1),
-		COMPLEATE("COMPLEATE", 2),
+		COMPLETED("COMPLETED", 2),
 		CANCALED("CANCALED", 3);
 		
 		private final String name;
@@ -32,17 +35,22 @@ public class Order implements Identified<Integer>{
 	private Integer id;
 	private Date dateOrder;
 	private Date dateRelease;
-	private List<Book> books;
+	private Map<Book, Integer> booksCount;
 	private Status status;
+	private Integer price;
 	
-	public Order(Integer id, Date dateOrder, Date dateRelease, List<Book> books) { 
+	private final DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
+	
+	public Order() {}
+	
+	public Order(Integer id, Date dateOrder, Date dateRelease, Map<Book, Integer> books) {
 		this.id = id;
 		this.dateOrder = dateOrder;
 		this.dateRelease = dateRelease;
-		this.books = books;		
+		this.booksCount = books;
 	}
-
-	public Order(Integer id, Date dateOrder, Date dateRelease, List<Book> books, Status status) {
+	
+	public Order(Integer id, Date dateOrder, Date dateRelease, Map<Book, Integer> books, Status status) {
 		this(id, dateOrder, dateRelease, books);
 		this.status = status;
 	}
@@ -71,20 +79,34 @@ public class Order implements Identified<Integer>{
 		this.dateRelease = dateRelease;
 	}
 	
+	
 	public Integer getPrice() {
-		Integer price = 0; //books.stream().mapToInt(a -> a.getPrice()).sum();
-		for(Book b : books) { 
-			price += b.getPrice();
-		}
-		return price;
-	}
-		
-	public List<Book> getBooks() {
-		return books;
+		return booksCount.keySet().stream()
+					.mapToInt(book -> book.getPrice())
+					.sum();
 	}
 	
-	public void setBooks(List<Book> books) {
-		this.books = books;
+	public void setIdCountBooks(Map<Book, Integer> map) { 
+		booksCount = map;
+	}
+	
+	public Map<Book, Integer> getBooksCount() {
+		return booksCount;
+	}
+	
+	public Set<Book> getBooks() { 
+		return booksCount.keySet();
+	}
+	
+	public void addBooks(Book book, int count) {
+		if(book == null || count <= 0) { 
+			throw new IllegalArgumentException();
+		}
+		if(booksCount.containsKey(book)) { 
+			booksCount.compute(book, (key, value) -> value + count);
+		} else { 
+			booksCount.put(book, 1);
+		}
 	}
 	
 	public Status getStatus() {
@@ -95,23 +117,47 @@ public class Order implements Identified<Integer>{
 		this.status = status;
 	}	
 	
-	public int hashCode() { 
-		return id.hashCode();
-	}
-	
-	public boolean equals(Object o) { 
-		boolean result = false;
-		if(this.id == ((Order)o).getId()) { 
-			result = true;
-		}
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((dateOrder == null) ? 0 : dateOrder.hashCode());
+		result = prime * result + ((dateRelease == null) ? 0 : dateRelease.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((status == null) ? 0 : status.hashCode());
 		return result;
 	}
-	
-	public String toString() { 
-		DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
 
-		return "Order [ID=" + id + ", DataOrder=" + dateOrder + ", DateRelease=" + dateFormat.format(dateRelease) + 
-				", Price=" + getPrice() + ", Books=" + books.toString() + ", Status=" + status.toString() + "]";
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Order other = (Order) obj;
+		if (dateOrder == null) {
+			if (other.dateOrder != null)
+				return false;
+		} else if (!dateOrder.equals(other.dateOrder))
+			return false;
+		if (dateRelease == null) {
+			if (other.dateRelease != null)
+				return false;
+		} else if (!dateRelease.equals(other.dateRelease))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (status != other.status)
+			return false;
+		return true;
+	}
+
+	public String toString() {
+		return "Order [ID=" + id + ", DataOrder=" + dateFormat.format(dateOrder) + ", DateRelease=" + dateFormat.format(dateRelease) + 
+				", Price=" + getPrice() + ", IdCountBooks=" + booksCount.toString() + ", Status=" + status.toString() + "]";
 	}	
 	
 }

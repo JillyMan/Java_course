@@ -1,10 +1,10 @@
 package com.test;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.bookshop.core.comparator.BookComparators;
 import com.bookshop.core.comparator.OrderComparators;
@@ -14,6 +14,7 @@ import com.bookshop.core.model.Author;
 import com.bookshop.core.model.Book;
 import com.bookshop.core.model.Order;
 import com.bookshop.core.model.RequestsBook;
+import com.bookshop.dao.StorageFactory;
 import com.bookshop.dao.util.BookFileUtil;
 import com.bookshop.dao.util.OrderFileUtil;
 import com.bookshop.dao.util.RequestBookFileUtil;
@@ -22,20 +23,24 @@ import com.bookshop.service.ServiceOrder;
 import com.bookshop.service.ServiceRequestBook;
 
 public class Program {
-	public static Book book0;
-	public static Book book1;
-	public static Book book2;
+	private Book book0;
+	private Book book1;
+	private Book book2;
+	
+	private Order order0;
+	private Order order1;
+	private Order order2;
+	
+	private RequestsBook req0;
+	private RequestsBook req1;
+	private RequestsBook req2;
+	
+	private ServiceOrder serviceOrder = new ServiceOrder();
+	private ServiceBook serviceBook = new ServiceBook();
+	private ServiceRequestBook servReqBook = new ServiceRequestBook();
 
-	public static Order order0;
-	public static Order order1;
-	public static Order order2;
-	
-	public static RequestsBook req0;
-	public static RequestsBook req1;
-	public static RequestsBook req2;
-	
 	@SuppressWarnings("deprecation")
-	public static void fillFileBooks() {
+	private void fillFileBooks() {
 		
 		book0 = new Book(1, 100, new Author("man1", "man1"), "BBB", 
 				new Date(101, 2, 1), new Date(100, 5, 2));	
@@ -43,7 +48,7 @@ public class Program {
 				new Date(112, 3, 3), new Date(110, 1, 2));	
 		book2 = new Book(3, 100, new Author("man3", "man3"), "AAA", 
 				new Date(118, 7, 3), new Date(111, 4, 2));
-		
+				
 		BookFileUtil bookUtil = new BookFileUtil("data/books.txt"); 
 		
 		List<Book> books = new ArrayList<Book>();
@@ -60,10 +65,21 @@ public class Program {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public static void fillFileOrder() { 
-		order0 = new Order(1, new Date(102, 2, 4), new Date(102, 2, 10), Arrays.asList(new Book[] { book0, book2}), Order.Status.COMPLEATE);
-		order1 = new Order(2, new Date(), new Date(119, 1, 1), Arrays.asList(new Book[] { book0, book1, book2}), Order.Status.CANCALED);
-		order2 = new Order(3, new Date(), new Date(118, 11, 1), Arrays.asList(new Book[] { book2}), Order.Status.AWAITING);
+	private void fillFileOrder() { 
+		Map<Book, Integer> map0 = new HashMap<Book, Integer>();
+		map0.put(book0, 1);
+		map0.put(book2, 2);
+		order0 = new Order(1, new Date(102, 2, 4), new Date(102, 2, 10), map0, Order.Status.COMPLETED);
+		
+		Map<Book, Integer> map1 = new HashMap<Book, Integer>();		
+		map1.put(book0, 1);
+		map1.put(book1, 3);
+		map1.put(book2, 2);
+		order1 = new Order(2, new Date(), new Date(119, 1, 1), map1, Order.Status.CANCALED);
+
+		Map<Book, Integer> map2 = new HashMap<Book, Integer>();
+		map2.put(book2, 2);
+		order2 = new Order(3, new Date(), new Date(118, 11, 1), map2, Order.Status.AWAITING);
 		
 		OrderFileUtil fileUtil = new OrderFileUtil("data/orders.txt");
 		
@@ -80,7 +96,7 @@ public class Program {
 		}
 	}
 
-	public static void fillRequestsBook() { 
+	private void fillRequestsBook() { 
 		req0 = new RequestsBook(book0, 1, 0);
 		req1 = new RequestsBook(book1, 1, 0);
 		req2 = new RequestsBook(book2, 1, 2);
@@ -102,19 +118,17 @@ public class Program {
 		}		
 	}	
 	
-	@SuppressWarnings("deprecation")
-	public static void main(String[] args) throws ParseException {
-		if(args.length == 3) { 
-			
-		}
-		System.out.println("Fill data\n-----------");
+	private void fillData() { 
+		
+		System.out.println("Fill test data\n-----------");
 		fillFileBooks();
 		fillFileOrder();
 		fillRequestsBook();
 		System.out.println("---------");
-				
+	}
+
+	private void testServiceBook() { 
 		System.out.println("Testing ServiceBook:");
-		ServiceBook serviceBook = new ServiceBook();
 		System.out.println("Add book2 ");
 		book0.setDateReceipt(new Date());
 		serviceBook.add(book2, 10);
@@ -126,59 +140,79 @@ public class Program {
 		System.out.println("Get ancient book(date recepient > 6 month)");
 		list = serviceBook.ancientBooks(BookComparators.getComparator(BookComparators.Type.DATERECEIPT));
 		for (Book book : list) {
-			System.out.println("\tId:" + book.getId() + " " + book.getDateReceipt());
+			System.out.println("\tId = " + book.getId() + " Date = " + book.getDateReceipt());
 		}	
 		System.out.println("---------");
-
+	}
+	
+	private void testServiceRequests() { 
 		System.out.println("Testing ServiceRequestsBook:");
-		ServiceRequestBook servReqBook = new ServiceRequestBook();
 		System.out.println("Make request on book: ");
 		
-		System.out.println("Before make requests");
+		System.out.println("Before make 2 requests on book0");
 		servReqBook.sortBy(RequestBookComparator.getComparator(Type.REQUESTS))
-					.forEach(x -> System.out.println(x));
-		servReqBook.makeRequest(book0);
+					.forEach(x -> System.out.println("\t" + x));
+		servReqBook.makeRequest(book0, 2);
 		System.out.println("After make requests, and sort by count requests");
 		servReqBook.sortBy(RequestBookComparator.getComparator(Type.REQUESTS))
-					.forEach(x -> System.out.println(x));		
+					.forEach(x -> System.out.println("\t" + x));		
 		
-		System.out.println("Derigiser book2");
-		servReqBook.deregister(book2, 2);
+		System.out.println("Derigiser two -> book2 ");
+		servReqBook.deregisterBook(book2, 2);
 		servReqBook.sortBy(RequestBookComparator.getComparator(Type.ONSTORAGE))
-					.forEach(x -> System.out.println(x));		
+					.forEach(x -> System.out.println("\t" + x));		
 		System.out.println("---------");
-
+	}
+	
+	@SuppressWarnings("deprecation")
+	private void testServiceOrder() { 
 		System.out.println("Testing ServiceOrder:");
-		ServiceOrder serviceOrder = new ServiceOrder();
 		int count = serviceOrder.getCountCompleateForPeriod(new Date(102, 2, 1), new Date(102, 3, 1));		
 		System.out.println("Count compleate order for period (2002:02:01; 2002:03:01) -> " + count);
 		serviceOrder.getCompleateForPeriod(new Date(102, 2, 1), new Date(102, 3, 1))
-					.forEach(x -> System.out.println(x));
+					.forEach(x -> System.out.println("\t" + x));
 		int money = serviceOrder.getEarnedMoney(new Date(102, 2, 1), new Date(102, 3, 1));
 		System.out.println("Wage for period (2002:02:01; 2002:03:01) -> " + money);
 		System.out.println("\t---");
 		System.out.println("Befor add \'order2\' and requestsBook");
 		serviceOrder.sortBy(OrderComparators.getComparator(OrderComparators.Type.RELEASE))
-					.forEach(x -> System.out.println(x));
+					.forEach(x -> System.out.println("\t" + x));
 		servReqBook.sortBy(RequestBookComparator.getComparator(Type.REQUESTS))
-					.forEach(x -> System.out.println(x));	
+					.forEach(x -> System.out.println("\t" + x));	
 		System.out.println("\t---");
 		System.out.println("Add order (order2 = {book: book2})");
 		serviceOrder.add(order2);
-		System.out.println("After order (order2 = {book: book2}), also changes requestsBook");
+		System.out.println("After order (order2 = {book: book2, 2 count}), also changes requestsBook");
 		System.out.println("\t---");
 		serviceOrder.sortBy(OrderComparators.getComparator(OrderComparators.Type.RELEASE))
-					.forEach(x -> System.out.println(x));
+					.forEach(x -> System.out.println("\t" + x));
 		servReqBook.sortBy(RequestBookComparator.getComparator(Type.REQUESTS))
-					.forEach(x -> System.out.println(x));	
+					.forEach(x -> System.out.println("\t" + x));	
 		System.out.println("\t---");		
 		System.out.println("Equip order2");
 
 		if(serviceOrder.equip(order2)) { 
 			serviceOrder.sortBy(OrderComparators.getComparator(OrderComparators.Type.STATUS))
-			.forEach(x -> System.out.println(x));
+			.forEach(x -> System.out.println("\t" + x));
 			servReqBook.sortBy(RequestBookComparator.getComparator(Type.REQUESTS))
-				.forEach(x -> System.out.println(x));	
+				.forEach(x -> System.out.println("\t" + x));	
 		}
+	}
+	
+	public void run() { 
+		fillData();
+		testServiceBook();
+		testServiceRequests();
+		testServiceOrder();
+	}
+	
+	public static void main(String[] args) {
+		if(args.length == 1) { 
+			StorageFactory.initFactory(args[0]);
+		} else {
+			StorageFactory.initFactory(null);			
+		}
+		
+		new Program().run();
 	}
 }
