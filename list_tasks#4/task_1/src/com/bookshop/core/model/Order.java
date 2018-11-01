@@ -1,10 +1,9 @@
 package com.bookshop.core.model;
 
 import java.text.DateFormat;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,7 +36,6 @@ public class Order implements Identified<Integer>{
 	private Date dateRelease;
 	private Map<Book, Integer> booksCount;
 	private Status status;
-	private Integer price;
 	
 	private final DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
 	
@@ -79,11 +77,14 @@ public class Order implements Identified<Integer>{
 		this.dateRelease = dateRelease;
 	}
 	
-	
 	public Integer getPrice() {
-		return booksCount.keySet().stream()
+		int result = 0;
+		if(booksCount != null) { 
+			result = booksCount.keySet().stream()
 					.mapToInt(book -> book.getPrice())
 					.sum();
+		}
+		return result;
 	}
 	
 	public void setIdCountBooks(Map<Book, Integer> map) { 

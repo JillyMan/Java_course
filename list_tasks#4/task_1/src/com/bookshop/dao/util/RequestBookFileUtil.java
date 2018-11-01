@@ -15,7 +15,6 @@ import com.textfileworker.TextFileWorker;
 public class RequestBookFileUtil implements FileUtil<RequestsBook>{
 
 	private final FileWorker fileWorker;
-	private BookFileUtil bookParser = new BookFileUtil("empty.txt");
 	
 	public RequestBookFileUtil(String path) { 
 		fileWorker = new TextFileWorker(path);
