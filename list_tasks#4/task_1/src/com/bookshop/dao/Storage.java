@@ -22,7 +22,7 @@ public class Storage<T extends Identified<Integer>> implements Storable<T> {
 			fileUtil.writeToFile(set);	
 		}
 	}
- 
+
 	public void update(T item) {
 		if(item != null) {			
 			Set<T> set = new HashSet<T>(getAll()); 
