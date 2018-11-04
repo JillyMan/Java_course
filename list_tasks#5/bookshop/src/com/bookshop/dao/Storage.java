@@ -16,30 +16,37 @@ public class Storage<T extends Identified<Integer>> implements Storable<T> {
 		this.fileUtil = connector;		
 	}
 	
-	public void add(T item) {
+	public void add(T item) throws StorageException  {
+		if(item == null) { 
+			throw new IllegalArgumentException("Item == null");
+		}
 		Set<T> set = new HashSet<T>(getAll());
 		if(set.add(item)) {
-			fileUtil.writeToFile(set);	
+			fileUtil.writeToFile(set);
+		} else {
+			throw new StorageException("Item already located in storage: " + item);
 		}
 	}
 
-	public void update(T item) {
-		if(item != null) {			
-			Set<T> set = new HashSet<T>(getAll()); 
-			T element = set.stream()
-				.filter(x -> x.getId() == item.getId())
-				.findFirst()
-				.orElseThrow(() -> new  RuntimeException("Item: " + item + " not found"));
-			set.remove(element);
-			if(set.add(item)) { 
-				fileUtil.writeToFile(set);											
-			}
-		} else {
+	public void update(T item) throws StorageException {
+		if(item == null) {			
 			throw new IllegalArgumentException("Item == null");
+		}
+
+		Set<T> set = new HashSet<T>(getAll()); 
+		T element = set.stream()
+			.filter(x -> x.getId() == item.getId())
+			.findFirst()
+			.orElseThrow(() -> new StorageException("Item not found: " + item));
+		
+		if(set.remove(element) && set.add(item)) { 
+			fileUtil.writeToFile(set);											
+		} else {
+			throw new StorageException("Can't update item: " + item);
 		}
 	}
 	
-	public boolean delete(T item) {
+	public void delete(T item) throws StorageException {
 		if(item == null) {
 			throw new IllegalArgumentException("Item == null");
 		}
@@ -47,19 +54,19 @@ public class Storage<T extends Identified<Integer>> implements Storable<T> {
 		boolean result = list.remove(item);
 		if(result) { 
 			fileUtil.writeToFile(list);			
-		} 
-		return result;
+		} else { 
+			throw new StorageException("Item have not been removed: " + item);
+		}
 	}
 
 	public List<T> getAll() {
 		return fileUtil.readFromFile();
 	}
 
-	public T getById(Integer id) {
+	public T getById(Integer id) throws StorageException {
 		return 	getAll().stream()
 				.filter(item -> item.getId().equals(id))
 				.findFirst()
-				.orElseThrow(() -> new  RuntimeException("Item with id = " + id + " not found"));
-	}
-	
+				.orElseThrow(() -> new  StorageException(this.getClass().getName() + " with id = " + id + " not found"));
+	}	
 }

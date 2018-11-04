@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import com.bookshop.core.model.Book;
@@ -12,26 +14,35 @@ import com.bookshop.core.model.Order;
 import com.bookshop.core.model.Order.Status;
 import com.bookshop.core.model.RequestsBook;
 import com.bookshop.dao.Storable;
+import com.bookshop.dao.StorageException;
 import com.bookshop.dao.StorageFactory;
+import com.bookshop.service.exception.ServiceOrderException;
 
 public class ServiceOrder {
 	
+	private static final Logger log = Logger.getLogger(ServiceOrder.class.getName());
 	private final Storable<Order> connector = StorageFactory.getInstance().getOrderStorage();
 	
 	public ServiceOrder() { 
 		
 	}
 	
-	public void add(Order order) {
+	public void add(Order order) throws ServiceOrderException {
 		if(order == null) { 
 			throw new IllegalArgumentException("Order has value null");			
 		}
 		order.setStatus(Order.Status.AWAITING);
-		connector.add(order);	
 		
 		ServiceRequestBook reqSevice = new ServiceRequestBook();
 		Map<Book, Integer> bookCount = order.getBooksCount();
 		bookCount.forEach((book, count) -> reqSevice.makeRequest(book, bookCount.get(book)));
+
+		try {
+			connector.add(order);
+		} catch (StorageException e) {
+			log.info(e.getMessage());
+			throw new ServiceOrderException("Order not add");
+		}		
 	}
 		
 	public void cancel(Order order) {
@@ -48,7 +59,11 @@ public class ServiceOrder {
 		Map<Book, Integer> bookCount = order.getBooksCount();
 		bookCount.forEach((book, count) -> reqSevice.removeRequest(book, bookCount.get(book)));
 		
-		connector.update(order);
+		try {
+			connector.update(order);
+		} catch (StorageException e) {
+			log.info(e.getMessage());
+		}
 	}
 
 	public boolean equip(Order order) { 
@@ -62,7 +77,13 @@ public class ServiceOrder {
 		Map<Book, Integer> booksCount = order.getBooksCount();	
 		List<RequestsBook> requests = new ArrayList<RequestsBook>();
 		
-		booksCount.keySet().forEach(book -> requests.add(requestConnector.getById(book.getId())));
+		booksCount.keySet().forEach(book -> {
+			try {
+				requests.add(requestConnector.getById(book.getId()));
+			} catch (StorageException e) {
+
+			}
+		});
 				
 		if(booksCount.size() == requests.size()) { 			
 			result = requests.stream()

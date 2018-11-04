@@ -1,10 +1,15 @@
 package com.test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import com.bookshop.core.comparator.BookComparators;
 import com.bookshop.core.comparator.OrderComparators;
@@ -14,6 +19,7 @@ import com.bookshop.core.model.Author;
 import com.bookshop.core.model.Book;
 import com.bookshop.core.model.Order;
 import com.bookshop.core.model.RequestsBook;
+import com.bookshop.dao.StorageException;
 import com.bookshop.dao.StorageFactory;
 import com.bookshop.dao.util.BookFileUtil;
 import com.bookshop.dao.util.OrderFileUtil;
@@ -21,6 +27,8 @@ import com.bookshop.dao.util.RequestBookFileUtil;
 import com.bookshop.service.ServiceBook;
 import com.bookshop.service.ServiceOrder;
 import com.bookshop.service.ServiceRequestBook;
+import com.bookshop.service.exception.ServiceBookException;
+import com.bookshop.service.exception.ServiceRequestsBookException;
 
 public class Program {
 	private Book book0;
@@ -131,7 +139,13 @@ public class Program {
 		System.out.println("Testing ServiceBook:");
 		System.out.println("Add book2 ");
 		book0.setDateReceipt(new Date());
-		serviceBook.add(book2, 10);
+		
+		try {
+			serviceBook.add(book2, 10);
+		} catch (ServiceBookException | StorageException | ServiceRequestsBookException e) {
+			e.printStackTrace();
+		}
+		
 		System.out.println("Compare book by title: ");
 		List<Book> list = serviceBook.sortBy(BookComparators.getComparator(BookComparators.Type.NAME));			
 		for (Book book : list) {
@@ -206,13 +220,13 @@ public class Program {
 		testServiceOrder();
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		if(args.length == 1) { 
 			StorageFactory.initFactory(args[0]);
 		} else {
 			StorageFactory.initFactory(null);			
 		}
-		
+
 		new Program().run();
 	}
 }
