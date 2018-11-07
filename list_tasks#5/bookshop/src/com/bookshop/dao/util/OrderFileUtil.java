@@ -13,6 +13,7 @@ import java.util.Map;
 import com.bookshop.core.model.Book;
 import com.bookshop.core.model.Order;
 import com.bookshop.dao.Storable;
+import com.bookshop.dao.StorageException;
 import com.bookshop.dao.StorageFactory;
 import com.textfileworker.FileUtil;
 import com.textfileworker.FileWorker;
@@ -92,7 +93,12 @@ public class OrderFileUtil implements FileUtil<Order> {
 		
 		for(int i = 0; i < mapValue.length - 1; i++) { 
 			if(!mapValue[i].equals("")) {
-				Book book = storeBook.getById(Integer.valueOf(mapValue[i]));
+				Book book = null;
+				try {
+					book = storeBook.getById(Integer.valueOf(mapValue[i]));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				if(book == null) { 
 					throw new RuntimeException("Book by id = " + mapValue[i] + " not found");
 				}

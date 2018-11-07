@@ -1,14 +1,14 @@
 package com.bookshop.service;
 
 import java.util.ArrayList;
+
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import com.bookshop.core.comparator.OrderComparators;
 import com.bookshop.core.model.Book;
 import com.bookshop.core.model.Order;
 import com.bookshop.core.model.Order.Status;
@@ -16,18 +16,17 @@ import com.bookshop.core.model.RequestsBook;
 import com.bookshop.dao.Storable;
 import com.bookshop.dao.StorageException;
 import com.bookshop.dao.StorageFactory;
-import com.bookshop.service.exception.ServiceOrderException;
 
 public class ServiceOrder {
 	
-	private static final Logger log = Logger.getLogger(ServiceOrder.class.getName());
+//	private static final Logger log = Logger.getLogger(ServiceOrder.class.getName());
 	private final Storable<Order> connector = StorageFactory.getInstance().getOrderStorage();
 	
 	public ServiceOrder() { 
 		
 	}
 	
-	public void add(Order order) throws ServiceOrderException {
+	public void add(Order order) throws StorageException {
 		if(order == null) { 
 			throw new IllegalArgumentException("Order has value null");			
 		}
@@ -35,17 +34,14 @@ public class ServiceOrder {
 		
 		ServiceRequestBook reqSevice = new ServiceRequestBook();
 		Map<Book, Integer> bookCount = order.getBooksCount();
-		bookCount.forEach((book, count) -> reqSevice.makeRequest(book, bookCount.get(book)));
+		for(Book book : bookCount.keySet()) { 
+			reqSevice.makeRequest(book, bookCount.get(book));
+		}
 
-		try {
-			connector.add(order);
-		} catch (StorageException e) {
-			log.info(e.getMessage());
-			throw new ServiceOrderException("Order not add");
-		}		
+		connector.add(order);
 	}
 		
-	public void cancel(Order order) {
+	public void cancel(Order order) throws StorageException {
 		if(order == null) {
 			throw new IllegalArgumentException("Order has value null");
 		} else if(!order.getStatus().equals(Status.AWAITING)) {
@@ -57,16 +53,15 @@ public class ServiceOrder {
 
 		ServiceRequestBook reqSevice = new ServiceRequestBook();
 		Map<Book, Integer> bookCount = order.getBooksCount();
-		bookCount.forEach((book, count) -> reqSevice.removeRequest(book, bookCount.get(book)));
-		
-		try {
-			connector.update(order);
-		} catch (StorageException e) {
-			log.info(e.getMessage());
+
+		for(Book book : bookCount.keySet()) { 
+			reqSevice.removeRequest(book, bookCount.get(book));
 		}
+		
+		connector.update(order);
 	}
 
-	public boolean equip(Order order) { 
+	public boolean equip(Order order) throws StorageException { 
 		boolean result = false;
 		if(!order.getStatus().equals(Status.AWAITING)) { 
 			throw new IllegalArgumentException();
@@ -77,25 +72,19 @@ public class ServiceOrder {
 		Map<Book, Integer> booksCount = order.getBooksCount();	
 		List<RequestsBook> requests = new ArrayList<RequestsBook>();
 		
-		booksCount.keySet().forEach(book -> {
-			try {
-				requests.add(requestConnector.getById(book.getId()));
-			} catch (StorageException e) {
-
-			}
-		});
+		for(Book book : booksCount.keySet()) { 
+			requests.add(requestConnector.getById(book.getId()));			
+		}
 				
 		if(booksCount.size() == requests.size()) { 			
 			result = requests.stream()
-				.allMatch((req) ->  {
-					return req.getBooksOnStorage() >= booksCount.get(req.getBook());
-				});
+							.allMatch(req -> req.getBooksOnStorage() >= booksCount.get(req.getBook()));
 			if(result) { 
-				requests.forEach((req) -> {
+				for(RequestsBook req : requests) {
 					int needBook = booksCount.get(req.getBook());
 					serviceReq.deregisterBook(req.getBook(), needBook);
-					serviceReq.removeRequest(req.getBook(), needBook);					
-				});
+					serviceReq.removeRequest(req.getBook(), needBook);
+				}
 				order.setStatus(Order.Status.COMPLETED);
 				connector.update(order);
 			}
@@ -111,7 +100,7 @@ public class ServiceOrder {
 				.collect(Collectors.toList());
 	}
 	
-	public List<Order> getCompleateForPeriod(Date min, Date max) {
+	private List<Order> getCompleateForPeriod(Date min, Date max) {
 		if(min == null || max == null) { 
 			throw new IllegalArgumentException();
 		}
@@ -125,6 +114,12 @@ public class ServiceOrder {
 		return result;
 	}	
 	
+	public List<Order> getCompleateForPeriod(Date min, Date max, OrderComparators.Type type) {
+		List<Order> list = getCompleateForPeriod(min, max);
+		list.sort(OrderComparators.getComparator(type));
+		return list;
+	}
+
 	public int getEarnedMoney(Date min, Date max) { 
 		List<Order> result = getCompleateForPeriod(min, max);
 		return result.stream().mapToInt(o -> o.getPrice()).sum();

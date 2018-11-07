@@ -6,6 +6,7 @@ import java.util.List;
 import com.bookshop.core.model.Book;
 import com.bookshop.core.model.RequestsBook;
 import com.bookshop.dao.Storable;
+import com.bookshop.dao.StorageException;
 import com.bookshop.dao.StorageFactory;
 
 public class ServiceRequestBook {
@@ -16,7 +17,7 @@ public class ServiceRequestBook {
 		
 	} 
 	
-	public void deregisterBook(Book book, int quantity) {
+	public void deregisterBook(Book book, int quantity) throws StorageException {
 		if(book == null || quantity <= 0) { 
 			throw new IllegalArgumentException();
 		}
@@ -25,7 +26,7 @@ public class ServiceRequestBook {
 		connector.update(req);					
 	}
 
-	public void registerBook(Book book, int quantity) { 
+	public void registerBook(Book book, int quantity) throws StorageException { 
 		if(book == null || quantity <= 0) { 
 			throw new IllegalArgumentException();
 		}
@@ -34,7 +35,7 @@ public class ServiceRequestBook {
 		connector.update(req);					
 	}
 	
-	public void makeRequest(Book book, int quantity) { 
+	public void makeRequest(Book book, int quantity) throws StorageException { 
 		if(book == null || quantity <= 0) { 
 			throw new IllegalArgumentException();
 		}
@@ -43,7 +44,7 @@ public class ServiceRequestBook {
 		connector.update(req);
 	}
 
-	public void removeRequest(Book book, int quantity) { 
+	public void removeRequest(Book book, int quantity) throws StorageException { 
 		if(book == null || quantity <= 0) { 
 			throw new IllegalArgumentException();
 		}

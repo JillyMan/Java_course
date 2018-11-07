@@ -1,15 +1,10 @@
-package com.test;
+ package com.test;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 import com.bookshop.core.comparator.BookComparators;
 import com.bookshop.core.comparator.OrderComparators;
@@ -27,8 +22,6 @@ import com.bookshop.dao.util.RequestBookFileUtil;
 import com.bookshop.service.ServiceBook;
 import com.bookshop.service.ServiceOrder;
 import com.bookshop.service.ServiceRequestBook;
-import com.bookshop.service.exception.ServiceBookException;
-import com.bookshop.service.exception.ServiceRequestsBookException;
 
 public class Program {
 	private Book book0;
@@ -138,12 +131,12 @@ public class Program {
 	private void testServiceBook() { 
 		System.out.println("Testing ServiceBook:");
 		System.out.println("Add book2 ");
-		book0.setDateReceipt(new Date());
+		book2.setDateReceipt(new Date());
 		
 		try {
 			serviceBook.add(book2, 10);
-		} catch (ServiceBookException | StorageException | ServiceRequestsBookException e) {
-			e.printStackTrace();
+		} catch (StorageException e) {
+			System.out.println(e.getMessage());
 		}
 		
 		System.out.println("Compare book by title: ");
@@ -159,7 +152,7 @@ public class Program {
 		System.out.println("---------");
 	}
 	
-	private void testServiceRequests() { 
+	private void testServiceRequests() throws StorageException { 
 		System.out.println("Testing ServiceRequestsBook:");
 		System.out.println("Make request on book: ");
 		
@@ -179,11 +172,11 @@ public class Program {
 	}
 	
 	@SuppressWarnings("deprecation")
-	private void testServiceOrder() { 
+	private void testServiceOrder() throws StorageException { 
 		System.out.println("Testing ServiceOrder:");
 		int count = serviceOrder.getCountCompleateForPeriod(new Date(102, 2, 1), new Date(102, 3, 1));		
 		System.out.println("Count compleate order for period (2002:02:01; 2002:03:01) -> " + count);
-		serviceOrder.getCompleateForPeriod(new Date(102, 2, 1), new Date(102, 3, 1))
+		serviceOrder.getCompleateForPeriod(new Date(102, 2, 1), new Date(102, 3, 1), OrderComparators.Type.STATUS)
 					.forEach(x -> System.out.println("\t" + x));
 		int money = serviceOrder.getEarnedMoney(new Date(102, 2, 1), new Date(102, 3, 1));
 		System.out.println("Wage for period (2002:02:01; 2002:03:01) -> " + money);
@@ -215,18 +208,23 @@ public class Program {
 	
 	public void run() { 
 		fillData();
-		testServiceBook();
-		testServiceRequests();
-		testServiceOrder();
+		try {
+			testServiceRequests();
+			testServiceBook();
+			testServiceOrder();
+		} catch (StorageException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public static void main(String[] args) throws Exception {
 		if(args.length == 1) { 
-			StorageFactory.initFactory(args[0]);
+//			StorageFactory.initFactory(args[0]);
 		} else {
-			StorageFactory.initFactory(null);			
 		}
-
+		StorageFactory.initFactory(null);			
+	
 		new Program().run();
 	}
 }

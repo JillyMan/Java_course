@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.bookshop.core.model.Book;
 import com.bookshop.core.model.RequestsBook;
+import com.bookshop.dao.StorageException;
 import com.bookshop.dao.StorageFactory;
 import com.textfileworker.FileUtil;
 import com.textfileworker.FileWorker;
@@ -72,7 +73,12 @@ public class RequestBookFileUtil implements FileUtil<RequestsBook>{
 		
 		final String[] parts = line.split(";");
 				
-		Book book = StorageFactory.getInstance().getBookStorage().getById(Integer.valueOf(parts[0]));
+		Book book = null;
+		try {
+			book = StorageFactory.getInstance().getBookStorage().getById(Integer.valueOf(parts[0]));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		if(book == null) { 
 			throw new RuntimeException("Book by id" + parts[0] + " not found");
 		}
