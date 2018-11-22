@@ -4,18 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bookshop.core.comparator.BookComparators;
-import com.ui.action.book.ShowSortBooks;
+import com.ui.action.book.ShowSortBooksAction;
 import com.ui.builder.IBuilder;
-import com.ui.core.IAction;
 import com.ui.core.Menu;
 import com.ui.core.MenuItem;
 
 public class SortBookMenu implements IBuilder{
 	
-	private IAction action;
 	
-	public SortBookMenu(IAction action) {
-		this.action = action;
+	public SortBookMenu() {
 	}
 	
 	public Menu getMenu() {			
@@ -23,10 +20,10 @@ public class SortBookMenu implements IBuilder{
 		List<MenuItem> items = new ArrayList<MenuItem>();
 
 		for (BookComparators.Type t : BookComparators.Type.values()) {
-			items.add(new MenuItem(t.toString(), null, action));
+			items.add(new MenuItem(t.toString(), null, new ShowSortBooksAction(t)));
 		}
 		
-		Menu result = new Menu("Sort by", (MenuItem[]) items.toArray(new MenuItem[items.size()]));
+		Menu result = new Menu("Book sort by", (MenuItem[]) items.toArray(new MenuItem[items.size()]));
 
 		return result;
 	}
