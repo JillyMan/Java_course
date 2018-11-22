@@ -10,6 +10,7 @@ import com.bookshop.core.model.Book;
 import com.bookshop.core.model.Order;
 import com.bookshop.core.model.RequestsBook;
 import com.bookshop.dao.StorageException;
+import com.bookshop.dao.StorageFactory;
 import com.bookshop.service.ServiceBook;
 import com.bookshop.service.ServiceOrder;
 import com.bookshop.service.ServiceRequestBook;
@@ -19,15 +20,24 @@ public class BookShop {
 	private ServiceBook serviceBook;
 	private ServiceRequestBook serviceRequests;
 
-	public BookShop() { 
-		init();
-	}
+	private static BookShop instanceOfBookShop;
 	
-	private void init() { 
+	private BookShop() { 
 		serviceOrder = new ServiceOrder();
 		serviceBook = new ServiceBook();
 		serviceRequests = new ServiceRequestBook();
 	}
+
+	public static BookShop getInstance() {
+		if(instanceOfBookShop == null) {
+			instanceOfBookShop = new BookShop();
+		}
+		return instanceOfBookShop;
+	}
+		
+	public static void init(String path) {
+		StorageFactory.initFactory(path);	
+	}	
 	
 	public void addBook(Book book, int quantity) throws StorageException {	
 		serviceBook.add(book, quantity);
@@ -87,6 +97,5 @@ public class BookShop {
 		
 	public List<Book> getAncientBook(BookComparators.Type type) { 
 		return serviceBook.ancientBooks(BookComparators.getComparator(type));
-	}		
-	
+	}
 }

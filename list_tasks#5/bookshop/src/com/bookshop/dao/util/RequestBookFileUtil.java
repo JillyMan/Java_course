@@ -7,7 +7,6 @@ import java.util.List;
 
 import com.bookshop.core.model.Book;
 import com.bookshop.core.model.RequestsBook;
-import com.bookshop.dao.StorageException;
 import com.bookshop.dao.StorageFactory;
 import com.textfileworker.FileUtil;
 import com.textfileworker.FileWorker;

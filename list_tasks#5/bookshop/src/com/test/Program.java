@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bookshop.BookShop;
 import com.bookshop.core.comparator.BookComparators;
 import com.bookshop.core.comparator.OrderComparators;
 import com.bookshop.core.comparator.RequestBookComparator;
@@ -50,7 +51,7 @@ public class Program {
 		book2 = new Book(3, 100, new Author("man3", "man3"), "AAA", 
 				new Date(118, 7, 3), new Date(111, 4, 2));
 				
-		BookFileUtil bookUtil = new BookFileUtil("data/books.txt"); 
+		BookFileUtil bookUtil = new BookFileUtil("books.txt"); 
 		
 		List<Book> books = new ArrayList<Book>();
 		books.add(book0);
@@ -82,7 +83,7 @@ public class Program {
 		map2.put(book2, 2);
 		order2 = new Order(3, new Date(), new Date(118, 11, 1), map2, Order.Status.AWAITING);
 		
-		OrderFileUtil fileUtil = new OrderFileUtil("data/orders.txt");
+		OrderFileUtil fileUtil = new OrderFileUtil("orders.txt");
 		
 		List<Order> orders = new ArrayList<Order>();
 		orders.add(order0);
@@ -102,7 +103,7 @@ public class Program {
 		req1 = new RequestsBook(book1, 1, 0);
 		req2 = new RequestsBook(book2, 1, 2);
 	
-		RequestBookFileUtil reqUtil = new RequestBookFileUtil("data/requestsBook.txt");
+		RequestBookFileUtil reqUtil = new RequestBookFileUtil("requestsBook.txt");
 		
 		List<RequestsBook> reqs = new ArrayList<RequestsBook>();
 		reqs.add(req0);
@@ -213,18 +214,12 @@ public class Program {
 			testServiceBook();
 			testServiceOrder();
 		} catch (StorageException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
 	public static void main(String[] args) throws Exception {
-		if(args.length == 1) { 
-//			StorageFactory.initFactory(args[0]);
-		} else {
-		}
-		StorageFactory.initFactory(null);			
-	
+		StorageFactory.initFactory(null);				
 		new Program().run();
 	}
 }

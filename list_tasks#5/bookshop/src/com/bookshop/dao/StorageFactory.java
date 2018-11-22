@@ -1,6 +1,7 @@
 package com.bookshop.dao;
 
 import java.io.FileInputStream;
+
 import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -12,7 +13,6 @@ import com.bookshop.core.model.RequestsBook;
 import com.bookshop.dao.util.BookFileUtil;
 import com.bookshop.dao.util.OrderFileUtil;
 import com.bookshop.dao.util.RequestBookFileUtil;
-import com.test.Program;
 
 public class StorageFactory {
 
@@ -51,9 +51,9 @@ public class StorageFactory {
 	}
 	
 	public void initStorages(String path) { 
-		String booksPath = "res/books.txt";
-		String ordersPath = "res/orders.txt";
-		String requestsPath = "res/requestsBook.txt";
+		String booksPath = "books.txt";
+		String ordersPath = "orders.txt";
+		String requestsPath = "requestsBook.txt";
 		
 		if(path != null) {
 			FileInputStream fis = null;
@@ -61,13 +61,13 @@ public class StorageFactory {
 			try {
 				fis = new FileInputStream(path);
 				property.load(fis);
-				booksPath = property.getProperty("db.books");
-				ordersPath = property.getProperty("db.orders");
-				requestsPath = property.getProperty("db.requestsBook");
 			}catch(IOException e) {
 				Logger.getLogger(StorageFactory.class.getName()).log(Level.INFO, "Cannot read properties file", e);
-				 e.printStackTrace();
+				e.printStackTrace();
 			}
+			booksPath = property.getProperty("db.books");
+			ordersPath = property.getProperty("db.orders");
+			requestsPath = property.getProperty("db.requestsBook");
 		}
 		bookStorage = new Storage<Book>(new BookFileUtil(booksPath));
 		orderStorage = new Storage<Order>(new OrderFileUtil(ordersPath)); 	
