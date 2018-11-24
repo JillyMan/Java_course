@@ -1,5 +1,8 @@
 package com.bookshop.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -55,8 +58,16 @@ public class ServiceRequestBook {
 	}	
 
 	public List<RequestsBook> sortBy(Comparator<RequestsBook> comparator) { 
-		List<RequestsBook> result = connector.getAll();
-		result.sort(comparator);
+		Collection<RequestsBook> collection = connector.getAll();
+		List<RequestsBook> result = new ArrayList<RequestsBook>(collection);
+		Collections.sort(result, comparator);
 		return result;
 	}
 }
+
+
+
+
+
+
+

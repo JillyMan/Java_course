@@ -85,6 +85,7 @@ public class ServiceOrder {
 					serviceReq.deregisterBook(req.getBook(), needBook);
 					serviceReq.removeRequest(req.getBook(), needBook);
 				}
+				order.setDateRelease(new Date());
 				order.setStatus(Order.Status.COMPLETED);
 				connector.update(order);
 			}
@@ -104,12 +105,12 @@ public class ServiceOrder {
 		if(min == null || max == null) { 
 			throw new IllegalArgumentException();
 		}
-		List<Order> result = connector.getAll();
+		List<Order> result = new ArrayList<Order>(connector.getAll());
 		result.removeIf((Order o) -> { 	
-			if(o.getStatus() == Order.Status.COMPLETED) { 
-				return !(o.getDateRelease().before(min) || o.getDateRelease().after(max));				
+			if(o.getStatus() == Order.Status.COMPLETED) {
+				return (o.getDateRelease().before(min) || o.getDateRelease().after(max));				
 			}
-			return false;
+			return true;
 		});
 		return result;
 	}	
@@ -130,7 +131,7 @@ public class ServiceOrder {
 	}
 	
 	public List<Order> sortBy(Comparator<Order> comparator) {
-		List<Order> result = connector.getAll();
+		List<Order> result = new ArrayList<Order>(connector.getAll());
 		result.sort(comparator);
 		return result;
 	}

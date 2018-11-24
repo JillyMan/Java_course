@@ -1,11 +1,13 @@
 package com.bookshop.core.model;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Book implements Identified<Integer> {
-
+public class Book implements Identified<Integer>, Serializable {
+	private static final long serialVersionUID = -5753055421636639205L;
+	
 	private Integer id;
 	private Integer price;
 	private Author author;
@@ -58,14 +60,6 @@ public class Book implements Identified<Integer> {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	
-	public Date getDataRelease() {
-		return dateRelease;
-	}
-
-	public void setDataRelease(Date dataRelease) {
-		this.dateRelease = dataRelease;
-	}
 
 	public Integer getPrice() {
 		return price;
@@ -88,7 +82,7 @@ public class Book implements Identified<Integer> {
 		int result = 1;
 		result = prime * result + ((author == null) ? 0 : author.hashCode());
 		result = prime * result + ((dateRelease == null) ? 0 : dateRelease.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		//result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
@@ -111,11 +105,11 @@ public class Book implements Identified<Integer> {
 				return false;
 		} else if (!dateRelease.equals(other.dateRelease))
 			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
+//		if (id == null) {
+//			if (other.id != null)
+//				return false;
+//		} else if (!id.equals(other.id))
+//			return false;
 		if (title == null) {
 			if (other.title != null)
 				return false;

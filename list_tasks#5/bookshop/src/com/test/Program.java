@@ -1,12 +1,12 @@
  package com.test;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bookshop.BookShop;
 import com.bookshop.core.comparator.BookComparators;
 import com.bookshop.core.comparator.OrderComparators;
 import com.bookshop.core.comparator.RequestBookComparator;
@@ -53,7 +53,7 @@ public class Program {
 				
 		BookFileUtil bookUtil = new BookFileUtil("books.txt"); 
 		
-		List<Book> books = new ArrayList<Book>();
+		Collection<Book> books = new ArrayList<Book>();
 		books.add(book0);
 		books.add(book1);
 		books.add(book2);
@@ -85,7 +85,7 @@ public class Program {
 		
 		OrderFileUtil fileUtil = new OrderFileUtil("orders.txt");
 		
-		List<Order> orders = new ArrayList<Order>();
+		Collection<Order> orders = new ArrayList<Order>();
 		orders.add(order0);
 		orders.add(order1);
 		//orders.add(order2);
@@ -105,7 +105,7 @@ public class Program {
 	
 		RequestBookFileUtil reqUtil = new RequestBookFileUtil("requestsBook.txt");
 		
-		List<RequestsBook> reqs = new ArrayList<RequestsBook>();
+		Collection<RequestsBook> reqs = new ArrayList<RequestsBook>();
 		reqs.add(req0);
 		reqs.add(req1);
 		reqs.add(req2);
@@ -175,7 +175,7 @@ public class Program {
 	@SuppressWarnings("deprecation")
 	private void testServiceOrder() throws StorageException { 
 		System.out.println("Testing ServiceOrder:");
-		int count = serviceOrder.getCountCompleateForPeriod(new Date(102, 2, 1), new Date(102, 3, 1));		
+		int count = serviceOrder.getCountCompleateForPeriod(new Date(102, 1, 1), new Date(102, 3, 1));		
 		System.out.println("Count compleate order for period (2002:02:01; 2002:03:01) -> " + count);
 		serviceOrder.getCompleateForPeriod(new Date(102, 2, 1), new Date(102, 3, 1), OrderComparators.Type.STATUS)
 					.forEach(x -> System.out.println("\t" + x));
@@ -219,7 +219,7 @@ public class Program {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		StorageFactory.initFactory(null);				
+		StorageFactory.initFactory(null);						
 		new Program().run();
 	}
 }

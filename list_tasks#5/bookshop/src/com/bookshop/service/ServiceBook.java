@@ -37,14 +37,13 @@ public class ServiceBook {
 		} catch (StorageException e) { 
 			reqBook = new RequestsBook(book, 0, quantity);
 			reqStore.add(reqBook);
+			connector.add(book);
 		}
 		
 		if(reqBook != null) { 
 			reqBook.setBooksOnStorage(reqBook.getBooksOnStorage() + quantity);
 			reqStore.update(reqBook);			
 		}
-
-		connector.add(book);
 	}
 	
 	public List<Book> getBooksByOrder(Order order) throws StorageException { 
@@ -56,7 +55,7 @@ public class ServiceBook {
 	}
 	
 	public List<Book> sortBy(Comparator<Book> comparator) { 
-		List<Book> result = connector.getAll();
+		List<Book> result = new ArrayList<Book>(connector.getAll());		
 		result.sort(comparator);
 		return result;
 	}

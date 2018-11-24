@@ -1,6 +1,10 @@
 package com.bookshop.core.model;
 
-public class Author {
+import java.io.Serializable;
+
+public class Author implements Serializable {
+	private static final long serialVersionUID = -1131462630675635864L;
+
 	private String firstName;
 	private String lastName;
 	

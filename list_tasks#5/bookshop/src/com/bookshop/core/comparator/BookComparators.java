@@ -21,10 +21,10 @@ public class BookComparators {
 			result = (Book a, Book b) -> a.getTitle().compareTo(b.getTitle());
 			break;
 		case DATERELEASE:
-			result = (Book a, Book b) -> a.getDataRelease().compareTo(b.getDateRelease());
+			result = (Book a, Book b) -> a.getDateRelease().compareTo(b.getDateRelease());
 			break;
 		case DATERECEIPT:
-			result = (Book a, Book b) -> a.getDateReceipt().compareTo(b.getDataRelease());
+			result = (Book a, Book b) -> a.getDateReceipt().compareTo(b.getDateRelease());
 			break;
 		case PRICE:
 			result = (Book a, Book b) -> a.getPrice().compareTo(b.getPrice());

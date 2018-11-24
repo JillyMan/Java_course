@@ -1,6 +1,9 @@
 package com.bookshop.core.model;
 
-public class RequestsBook implements Identified<Integer>{			
+import java.io.Serializable;
+
+public class RequestsBook implements Identified<Integer>, Serializable {				
+	private static final long serialVersionUID = -1641531324126202949L;
 	
 	private Book book;
 	private Integer booksOnStorage;

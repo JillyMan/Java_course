@@ -17,14 +17,14 @@ public class Navigator {
 	
 	public void render() {
 		System.out.println(currentMenu.getName());
-		for(int i = 0; i < currentMenu.getMenuItems().length; ++i) {
+		for(int i = 0; i < currentMenu.getMenuItems().size(); ++i) {
 			System.out.println((i+1) + " - " + currentMenu.getMenuItem(i).getTitle());
 		}
 		
 		System.out.println("0 - close menu");
 	}
 	
-	public boolean navigate(Integer index) {	
+	public boolean navigate(Integer index) throws ArrayIndexOutOfBoundsException{				
 		if(index == PREVIOUS_MENU) {
 			if(!history.isEmpty()) {
 				currentMenu = history.pop();

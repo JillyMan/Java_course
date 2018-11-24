@@ -1,37 +1,36 @@
 package com.bookshop.dao.util;
 
+import java.io.FileInputStream;
 
-import java.util.ArrayList;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.List;
 
-import com.bookshop.core.model.Book;
 import com.bookshop.core.model.RequestsBook;
-import com.bookshop.dao.StorageFactory;
-import com.textfileworker.FileUtil;
-import com.textfileworker.FileWorker;
-import com.textfileworker.TextFileWorker;
 
 public class RequestBookFileUtil implements FileUtil<RequestsBook>{
 
-	private final FileWorker fileWorker;
+private String path;
 	
-	public RequestBookFileUtil(String path) { 
-		fileWorker = new TextFileWorker(path);
+	public RequestBookFileUtil (String path) { 
+		this.path = path;
 	}
 	
-	public List<RequestsBook> readFromFile() {
+	@SuppressWarnings("unchecked")
+	public Collection<RequestsBook> readFromFile() {
+		Collection<RequestsBook> result = null;
 		
-		List<String> lines = fileWorker.readFromFile();
-		
-		if (lines == null || lines.size() == 0) {
-			throw new IllegalArgumentException();
-		}
-
-		final List<RequestsBook> result = new ArrayList<RequestsBook>();
-
-		for(String line : lines) { 
-			result.add(fromLine(line));
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path))) {
+			result = (Collection<RequestsBook>)ois.readObject();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 
 		return result;
@@ -41,51 +40,13 @@ public class RequestBookFileUtil implements FileUtil<RequestsBook>{
 		if(values == null || values.size() == 0) { 
 			throw new IllegalArgumentException();
 		}
-		
-		final List<String> result = new ArrayList<String>();
 
-		for(RequestsBook req: values) { 
-			result.add(toLine(req));
-		}		
-		
-		fileWorker.writeToFile(result);
-	}
-
-	public String toLine(final RequestsBook entity) {
-		if(entity == null ) { 
-			throw new IllegalArgumentException();
-		}
-			
-		final String[] array = new String[] { 
-			String.valueOf(entity.getId()),
-			String.valueOf(entity.getQueryOnBook()),
-			String.valueOf(entity.getBooksOnStorage())
-		};
-		
-		return String.join(";", array);
-	}
-
-	public RequestsBook fromLine(String line) {
-		if(line == null || line.isEmpty()) { 
-			throw new IllegalArgumentException();
-		}
-		
-		final String[] parts = line.split(";");
-				
-		Book book = null;
-		try {
-			book = StorageFactory.getInstance().getBookStorage().getById(Integer.valueOf(parts[0]));
-		} catch (Exception e) {
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path, false))) {
+			oos.writeObject(values);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if(book == null) { 
-			throw new RuntimeException("Book by id" + parts[0] + " not found");
-		}
-		final RequestsBook result = new RequestsBook();
-		result.setBook(book);
-		result.setQueryOnBook(Integer.valueOf(parts[1]));
-		result.setBooksOnStorage(Integer.valueOf(parts[2]));
-		return result;
 	}
-
 }

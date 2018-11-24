@@ -51,12 +51,16 @@ public class BookShop {
 		serviceRequests.deregisterBook(book, quantity);
 	}
 
-	public void equipOrder(Order order) throws StorageException { 
-		serviceOrder.equip(order);
+	public void makeQueryBook(Book book, int count) throws StorageException {
+		serviceRequests.makeRequest(book, count);
 	}
 	
-	public void closeOrder(Order order) throws StorageException  { 
-		serviceOrder.add(order);
+	public boolean equipOrder(Order order) throws StorageException { 
+		return serviceOrder.equip(order);
+	}
+	
+	public void cancelOrder(Order order) throws StorageException  { 
+		serviceOrder.cancel(order);
 	}
 	
 	public List<Book> getBooks() { 
@@ -78,7 +82,7 @@ public class BookShop {
 	public List<RequestsBook> getRequest(RequestBookComparator.Type type) { 
 		return serviceRequests.sortBy(RequestBookComparator.getComparator(type));
 	}
-	
+		
 	public List<RequestsBook> getRequest() {
 		return serviceRequests.sortBy(RequestBookComparator.getComparator(RequestBookComparator.Type.REQUESTS));		
 	}
@@ -94,7 +98,11 @@ public class BookShop {
 	public int getCompletedOrderCount(Date min, Date max) { 
 		return serviceOrder.getCountCompleateForPeriod(min, max);
 	}
-		
+	
+	public List<Order> getAwaiting() { 
+		return serviceOrder.getAwaiting();
+	}
+	
 	public List<Book> getAncientBook(BookComparators.Type type) { 
 		return serviceBook.ancientBooks(BookComparators.getComparator(type));
 	}

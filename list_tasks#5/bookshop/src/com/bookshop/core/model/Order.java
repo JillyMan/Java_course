@@ -1,14 +1,19 @@
 package com.bookshop.core.model;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class Order implements Identified<Integer>{	
+//TODO: implements use Externalizable or not???
+public class Order implements Identified<Integer>, Serializable /*Externalizable*/ {	
 	
+	private static final long serialVersionUID = -4013503901685628461L;
+
 	public enum Status {
 		AWAITING("AWAITING", 1),
 		COMPLETED("COMPLETED", 2),
@@ -103,6 +108,11 @@ public class Order implements Identified<Integer>{
 		if(book == null || count <= 0) { 
 			throw new IllegalArgumentException();
 		}
+		
+		if(booksCount == null) {
+			booksCount = new HashMap<Book, Integer>();
+		}
+		
 		if(booksCount.containsKey(book)) { 
 			booksCount.compute(book, (key, value) -> value + count);
 		} else { 
@@ -159,6 +169,25 @@ public class Order implements Identified<Integer>{
 	public String toString() {
 		return "Order [ID=" + id + ", DataOrder=" + dateFormat.format(dateOrder) + ", DateRelease=" + dateFormat.format(dateRelease) + 
 				", Price=" + getPrice() + ", IdCountBooks=" + booksCount.toString() + ", Status=" + status.toString() + "]";
-	}	
-	
+	}
+
+/*
+	private Integer id;
+ 	private Date dateOrder;
+ 	private Date dateRelease;
+ 	transient private Map<Book, Integer> booksCount;
+ 	private Status status;
+
+	public void writeExternal(ObjectOutput out) throws IOException {
+			out.writeObject(id);
+			out.writeObject(dateOrder);
+			out.writeObject(dateRelease);
+			out.writeObject(booksCount.keySet());
+			out.writeObject(status);			
+	}
+
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		
+	}
+	*/
 }

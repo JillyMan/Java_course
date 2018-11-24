@@ -1,43 +1,35 @@
 package com.bookshop.dao.util;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.FileInputStream;
 
-import com.bookshop.core.model.Book;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Collection;
+
 import com.bookshop.core.model.Order;
-import com.bookshop.dao.Storable;
-import com.bookshop.dao.StorageFactory;
-import com.textfileworker.FileUtil;
-import com.textfileworker.FileWorker;
-import com.textfileworker.TextFileWorker;
 
 public class OrderFileUtil implements FileUtil<Order> {
-
-	private final FileWorker fileWorker;
-	private final DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
-
-	public OrderFileUtil(String path) { 
-		fileWorker = new TextFileWorker(path);
+	private String path;
+	
+	public OrderFileUtil (String path) { 
+		this.path = path;
 	}
-
-	public List<Order> readFromFile() {
+	
+	@SuppressWarnings("unchecked")
+	public Collection<Order> readFromFile() {
+		Collection<Order> result = null;
 		
-		List<String> lines = fileWorker.readFromFile();
-		
-		if (lines == null || lines.size() == 0) {
-			throw new IllegalArgumentException();
-		}
-
-		final List<Order> result = new ArrayList<Order>();
-
-		for(String line : lines) { 
-			result.add(fromLine(line));
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path))) {
+			result = (Collection<Order>)ois.readObject();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 
 		return result;
@@ -47,75 +39,13 @@ public class OrderFileUtil implements FileUtil<Order> {
 		if(values == null || values.size() == 0) { 
 			throw new IllegalArgumentException();
 		}
-		
-		final List<String> result = new ArrayList<String>();
 
-		for(Order order: values) { 
-			result.add(toLine(order));
-		}		
-		
-		fileWorker.writeToFile(result);
-	}
-
-	public String toLine(Order entity) {
-		if(entity == null) { 
-			throw new IllegalArgumentException();
-		}
-		
-		Map<Integer, Integer> idBookCount = new HashMap<Integer, Integer>();	
-		entity.getBooksCount().forEach((book, count) -> idBookCount.put(book.getId(), count));
-		
-		final String[] array = new String[] {
-			String.valueOf(entity.getId()),
-			dateFormat.format(entity.getDateOrder()),
-			dateFormat.format(entity.getDateRelease()),
-			idBookCount.toString(),
-			String.valueOf(entity.getStatus())
-		};
-		
-		return String.join(";", array);
-	}
-
-	public Order fromLine(String line) {
-		if(line == null || line.length() == 0) { 
-			throw new IllegalArgumentException();
-		}
-		
-		String[] parts = line.split(";");
-		
-		Order result = null;
-		Map<Book, Integer> map = new HashMap<Book, Integer>();
-		String[] mapValue = parts[3].split("\\D");
-		
-		Storable<Book> storeBook = StorageFactory.getInstance().getBookStorage();
-		
-		for(int i = 0; i < mapValue.length - 1; i++) { 
-			if(!mapValue[i].equals("")) {
-				Book book = null;
-				try {
-					book = storeBook.getById(Integer.valueOf(mapValue[i]));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				if(book == null) { 
-					throw new RuntimeException("Book by id = " + mapValue[i] + " not found");
-				}
-				map.put(book, Integer.valueOf(mapValue[i+1]));				
-				i++;
-			}
-		}
-		
-		try {
-			result = new Order();			
-			result.setId(Integer.valueOf(parts[0]));
-			result.setDateOrder(dateFormat.parse(parts[1]));
-			result.setDateRelease(dateFormat.parse(parts[2]));
-			result.setIdCountBooks(map);
-			result.setStatus(Order.Status.valueOf(parts[4]));
-		} catch (ParseException e) {
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path, false))) {
+			oos.writeObject(values);
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		}		
-		return result;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
-	
 }
