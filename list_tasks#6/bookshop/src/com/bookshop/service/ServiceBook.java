@@ -1,14 +1,11 @@
 package com.bookshop.service;
 
 import java.util.ArrayList;
-
 import java.util.Calendar;
-
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import static com.bookshop.util.DateUtil.monthsBetween;
 import com.bookshop.core.model.Book;
 import com.bookshop.core.model.Order;
 import com.bookshop.core.model.RequestsBook;
@@ -16,12 +13,21 @@ import com.bookshop.dao.Storable;
 import com.bookshop.dao.StorageException;
 import com.bookshop.dao.StorageFactory;
 
+import config.ConfigProject;
+
+import static com.bookshop.util.DateUtil.monthsBetween;
+
 public class ServiceBook {
 	
 	private final Storable<Book> connector = StorageFactory.getInstance().getBookStorage();
+	private int monthsAncient;
 	
 	public ServiceBook() { 
-		
+		init();
+	}
+	
+	private void init() {
+		monthsAncient = ConfigProject.getInstance().getMonthsAncient();
 	}
 	
 	public void add(Book book, int quantity) throws StorageException {
@@ -65,9 +71,8 @@ public class ServiceBook {
 		result.removeIf((Book b) -> { 	
 			Date now = Calendar.getInstance().getTime();
 			Date date = b.getDateReceipt();	
-			return !(monthsBetween(date, now) > 6);			
+			return !(monthsBetween(date, now) > monthsAncient);			
 		});
 		return result;
-	}
-	
+	}	
 }

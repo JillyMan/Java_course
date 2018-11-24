@@ -16,10 +16,10 @@ import com.bookshop.core.model.RequestsBook;
 import com.bookshop.dao.Storable;
 import com.bookshop.dao.StorageException;
 import com.bookshop.dao.StorageFactory;
+import com.bookshop.service.exception.ServiceOrderException;
 
 public class ServiceOrder {
 	
-//	private static final Logger log = Logger.getLogger(ServiceOrder.class.getName());
 	private final Storable<Order> connector = StorageFactory.getInstance().getOrderStorage();
 	
 	public ServiceOrder() { 
@@ -61,7 +61,7 @@ public class ServiceOrder {
 		connector.update(order);
 	}
 
-	public boolean equip(Order order) throws StorageException { 
+	public boolean equip(Order order) throws StorageException, ServiceOrderException { 
 		boolean result = false;
 		if(!order.getStatus().equals(Status.AWAITING)) { 
 			throw new IllegalArgumentException();
@@ -75,7 +75,7 @@ public class ServiceOrder {
 		for(Book book : booksCount.keySet()) { 
 			requests.add(requestConnector.getById(book.getId()));			
 		}
-				
+	
 		if(booksCount.size() == requests.size()) { 			
 			result = requests.stream()
 							.allMatch(req -> req.getBooksOnStorage() >= booksCount.get(req.getBook()));
@@ -89,6 +89,11 @@ public class ServiceOrder {
 				order.setStatus(Order.Status.COMPLETED);
 				connector.update(order);
 			}
+			else {
+				throw new ServiceOrderException("Not enough book on storage.");
+			}
+		} else {
+			throw new ServiceOrderException("Book in order no exist in storage.");
 		}
 		
 		return result;

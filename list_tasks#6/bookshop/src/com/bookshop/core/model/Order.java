@@ -1,5 +1,11 @@
 package com.bookshop.core.model;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
 
@@ -10,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 //TODO: implements use Externalizable or not???
-public class Order implements Identified<Integer>, Serializable /*Externalizable*/ {	
+public class Order implements Identified<Integer>, Serializable /*Externalizable*/, Cloneable {	
 	
 	private static final long serialVersionUID = -4013503901685628461L;
 
@@ -104,6 +110,33 @@ public class Order implements Identified<Integer>, Serializable /*Externalizable
 		return booksCount.keySet();
 	}
 	
+	public void setBook(Book book, int count) {
+		if(book == null || count < 0) { 
+			throw new IllegalArgumentException();
+		}
+
+		if(count <= 0) {
+			booksCount.remove(book);
+		} else {
+			booksCount.put(book, count);			
+		}
+	}
+	
+	public void removeBooks(Book book, int count) {
+		if(book == null || count <= 0) { 
+			throw new IllegalArgumentException();
+		}
+		
+		if(booksCount.containsKey(book)) {
+			int currentCount = booksCount.get(book) - count;
+			if(currentCount <= 0) {
+				booksCount.remove(book);
+			} else {
+				booksCount.replace(book, currentCount);				
+			}
+		}		
+	}
+	
 	public void addBooks(Book book, int count) {
 		if(book == null || count <= 0) { 
 			throw new IllegalArgumentException();
@@ -116,7 +149,7 @@ public class Order implements Identified<Integer>, Serializable /*Externalizable
 		if(booksCount.containsKey(book)) { 
 			booksCount.compute(book, (key, value) -> value + count);
 		} else { 
-			booksCount.put(book, 1);
+			booksCount.put(book, count);
 		}
 	}
 	
@@ -165,12 +198,43 @@ public class Order implements Identified<Integer>, Serializable /*Externalizable
 			return false;
 		return true;
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		
+		try (ObjectOutput out = new ObjectOutputStream(bos)) {			
+			out.writeObject(booksCount);
+			out.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		byte[] bytesBooksCount = bos.toByteArray();		
+		ByteArrayInputStream bis = new ByteArrayInputStream(bytesBooksCount);
+		Map<Book, Integer> newBooksCount = null;
+
+		try(ObjectInputStream oi = new ObjectInputStream(bis)){
+			newBooksCount = (Map<Book, Integer>)oi.readObject();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		if (newBooksCount == null) {
+			throw new CloneNotSupportedException();
+		}		
+		
+		Order obj = new Order(id, (Date)dateOrder.clone(), (Date)dateRelease.clone(), newBooksCount, status);
+		return obj;
+	}
 
 	public String toString() {
 		return "Order [ID=" + id + ", DataOrder=" + dateFormat.format(dateOrder) + ", DateRelease=" + dateFormat.format(dateRelease) + 
 				", Price=" + getPrice() + ", IdCountBooks=" + booksCount.toString() + ", Status=" + status.toString() + "]";
 	}
-
 /*
 	private Integer id;
  	private Date dateOrder;

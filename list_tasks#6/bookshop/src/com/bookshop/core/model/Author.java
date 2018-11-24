@@ -2,7 +2,7 @@ package com.bookshop.core.model;
 
 import java.io.Serializable;
 
-public class Author implements Serializable {
+public class Author implements Serializable, Cloneable {
 	private static final long serialVersionUID = -1131462630675635864L;
 
 	private String firstName;
@@ -32,6 +32,10 @@ public class Author implements Serializable {
 	public static Author valueOf(String line) { 
 		String[] result = line.split(" ");	
 		return new Author(result[0], result[1]);
+	}
+	
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 	
 	public int hashCode() {

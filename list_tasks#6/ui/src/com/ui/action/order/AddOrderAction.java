@@ -16,14 +16,21 @@ public class AddOrderAction implements IAction {
 	
 	private final String MESSAGE = "Your order: ";
 	
+	public AddOrderAction(Order order) {
+		this.order = order;
+		init();
+	}
+	
 	public AddOrderAction() {
 		init();
 	}
 
 	@SuppressWarnings("deprecation")
 	private void init() {
-		Date date = new Date();
-		order = new Order();
+		if(order == null) {
+			order = new Order();			
+		}
+		Date date = new Date();		
 		order.setId(new Random().nextInt(Integer.MAX_VALUE));
 		order.setDateOrder(date);
 		order.setDateRelease(new Date(date.getYear(), date.getMonth(), date.getDay() + 7));		
@@ -31,16 +38,21 @@ public class AddOrderAction implements IAction {
 	}
 	
 	public void addBook(Book book) {
+		order.addBooks(book, 1);
+	}
+	
+	public void setBook(Book book, int count) {
 		if(order == null) {
 			init();
 		}
+		
 		if(book != null) {
-			order.addBooks(book, 1);			
+			order.setBook(book, count);
 		}
 	}
-		
+	
 	public void action() {
-		try {		
+		try {
 			shop.addOrder(order);
 			System.out.println(MESSAGE + "\n" + order);
 			order = null;

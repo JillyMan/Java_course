@@ -7,11 +7,14 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.bookshop.core.model.Book;
 
 public class BookFileUtil implements FileUtil<Book> {
-	
+	private static final Logger log = Logger.getLogger(BookFileUtil.class.getName());
+
 	private String path;
 	
 	public BookFileUtil (String path) { 
@@ -25,11 +28,11 @@ public class BookFileUtil implements FileUtil<Book> {
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path))) {
 			result = (Collection<Book>)ois.readObject();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			log.log(Level.INFO, "File not fount", e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.log(Level.INFO, "IO Exception", e);
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			log.log(Level.INFO, "Class not found", e);
 		}
 
 		return result;
@@ -43,9 +46,9 @@ public class BookFileUtil implements FileUtil<Book> {
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path, false))) {
 			oos.writeObject(values);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			log.log(Level.INFO, "Class not found", e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.log(Level.INFO, "IO exception", e);
 		}
 	}
 }

@@ -14,6 +14,7 @@ import com.bookshop.dao.StorageFactory;
 import com.bookshop.service.ServiceBook;
 import com.bookshop.service.ServiceOrder;
 import com.bookshop.service.ServiceRequestBook;
+import com.bookshop.service.exception.ServiceOrderException;
 
 public class BookShop {
 	private ServiceOrder serviceOrder;
@@ -55,7 +56,7 @@ public class BookShop {
 		serviceRequests.makeRequest(book, count);
 	}
 	
-	public boolean equipOrder(Order order) throws StorageException { 
+	public boolean equipOrder(Order order) throws StorageException, ServiceOrderException { 
 		return serviceOrder.equip(order);
 	}
 	

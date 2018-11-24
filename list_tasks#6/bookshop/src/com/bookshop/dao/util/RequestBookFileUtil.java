@@ -8,12 +8,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.bookshop.core.model.RequestsBook;
 
 public class RequestBookFileUtil implements FileUtil<RequestsBook>{
 
-private String path;
+	private static final Logger log = Logger.getLogger(RequestBookFileUtil.class.getName());
+	
+	private String path;
 	
 	public RequestBookFileUtil (String path) { 
 		this.path = path;
@@ -26,13 +30,13 @@ private String path;
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path))) {
 			result = (Collection<RequestsBook>)ois.readObject();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			log.log(Level.INFO, "File not fount", e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.log(Level.INFO, "IO Exception", e);
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			log.log(Level.INFO, "Class not found", e);
 		}
-
+		
 		return result;
 	}
 
@@ -44,9 +48,9 @@ private String path;
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path, false))) {
 			oos.writeObject(values);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			log.log(Level.INFO, "File not fount", e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.log(Level.INFO, "IO Exception", e);
 		}
 	}
 }

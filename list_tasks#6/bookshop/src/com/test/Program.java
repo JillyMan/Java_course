@@ -1,7 +1,6 @@
  package com.test;
 
 import java.util.ArrayList;
-
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,6 +23,7 @@ import com.bookshop.dao.util.RequestBookFileUtil;
 import com.bookshop.service.ServiceBook;
 import com.bookshop.service.ServiceOrder;
 import com.bookshop.service.ServiceRequestBook;
+import com.bookshop.service.exception.ServiceOrderException;
 
 public class Program {
 	private Book book0;
@@ -174,7 +174,7 @@ public class Program {
 	}
 	
 	@SuppressWarnings("deprecation")
-	private void testServiceOrder() throws StorageException { 
+	private void testServiceOrder() throws StorageException, ServiceOrderException { 
 		System.out.println("Testing ServiceOrder:");
 		int count = serviceOrder.getCountCompleateForPeriod(new Date(102, 1, 1), new Date(102, 3, 1));		
 		System.out.println("Count compleate order for period (2002:02:01; 2002:03:01) -> " + count);
@@ -208,12 +208,15 @@ public class Program {
 		}
 	}
 	
-	public void run() { 
+	public void run()  { 
 		fillData();
+	
 		try {
 			testServiceRequests();
 			testServiceBook();
 			testServiceOrder();
+		} catch (ServiceOrderException e) {
+			e.printStackTrace();
 		} catch (StorageException e) {
 			e.printStackTrace();
 		}

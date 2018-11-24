@@ -2,7 +2,7 @@ package com.bookshop.core.model;
 
 import java.io.Serializable;
 
-public class RequestsBook implements Identified<Integer>, Serializable {				
+public class RequestsBook implements Identified<Integer>, Serializable, Cloneable {				
 	private static final long serialVersionUID = -1641531324126202949L;
 	
 	private Book book;
@@ -80,6 +80,10 @@ public class RequestsBook implements Identified<Integer>, Serializable {
 		return true;
 	}
 
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
+	
 	public String toString() {
 		return "QueryOnBook [Book=" + book + ", QueryOnBook=" + queryOnBook +
 				", BookOnStorage=" + booksOnStorage + "]";

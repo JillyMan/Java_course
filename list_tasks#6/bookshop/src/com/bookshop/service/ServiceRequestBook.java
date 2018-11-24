@@ -55,7 +55,7 @@ public class ServiceRequestBook {
 		RequestsBook req = connector.getById(book.getId());			
 		req.setQueryOnBook(req.getQueryOnBook() - quantity);
 		connector.update(req);
-	}	
+	}
 
 	public List<RequestsBook> sortBy(Comparator<RequestsBook> comparator) { 
 		Collection<RequestsBook> collection = connector.getAll();
@@ -64,10 +64,3 @@ public class ServiceRequestBook {
 		return result;
 	}
 }
-
-
-
-
-
-
-
