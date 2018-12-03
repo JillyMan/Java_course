@@ -1,11 +1,18 @@
 package com.bookshop.core.model;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
-public class RequestsBook implements Identified<Integer>, Serializable, Cloneable {				
+import com.bookshop.dao.Storable;
+import com.bookshop.dao.StorageException;
+import com.bookshop.dao.StorageFactory;
+
+public class RequestsBook implements Identified<Integer>, Externalizable, Cloneable {				
 	private static final long serialVersionUID = -1641531324126202949L;
 	
-	private Book book;
+	transient private Book book;
 	private Integer booksOnStorage;
 	private Integer queryOnBook;
 
@@ -88,5 +95,27 @@ public class RequestsBook implements Identified<Integer>, Serializable, Cloneabl
 		return "QueryOnBook [Book=" + book + ", QueryOnBook=" + queryOnBook +
 				", BookOnStorage=" + booksOnStorage + "]";
 	}
+
 	
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeObject(book.getId());
+		out.writeObject(queryOnBook);
+		out.writeObject(booksOnStorage);
+	}
+
+	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+		final Storable<Book> bookStore = StorageFactory.getInstance().getBookStorage();
+		int idBook = (int)in.readObject();		
+		Book book = null;
+		try {
+			book = bookStore.getById(idBook);
+		} catch (StorageException e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
+		
+		this.book = book;
+		this.queryOnBook = (int)in.readObject();
+		this.booksOnStorage = (int)in.readObject();
+	}
 }

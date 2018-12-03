@@ -2,7 +2,9 @@ package com.bookshop.core.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Externalizable;
 import java.io.IOException;
+import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
@@ -10,13 +12,21 @@ import java.io.Serializable;
 import java.text.DateFormat;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import com.bookshop.dao.Storable;
+import com.bookshop.dao.StorageException;
+import com.bookshop.dao.StorageFactory;
+
 import java.util.Set;
 
-//TODO: implements use Externalizable or not???
-public class Order implements Identified<Integer>, Serializable /*Externalizable*/, Cloneable {	
+
+public class Order implements Identified<Integer>, Externalizable, Cloneable {	
 	
 	private static final long serialVersionUID = -4013503901685628461L;
 
@@ -45,7 +55,7 @@ public class Order implements Identified<Integer>, Serializable /*Externalizable
 	private Integer id;
 	private Date dateOrder;
 	private Date dateRelease;
-	private Map<Book, Integer> booksCount;
+	transient private Map<Book, Integer> booksCount;
 	private Status status;
 	
 	private final DateFormat dateFormat = new SimpleDateFormat("d MMMM, yyyy");
@@ -114,29 +124,18 @@ public class Order implements Identified<Integer>, Serializable /*Externalizable
 		if(book == null || count < 0) { 
 			throw new IllegalArgumentException();
 		}
-
+		
+		if(booksCount == null) {
+			booksCount = new HashMap<Book, Integer>();
+		}
+		
 		if(count <= 0) {
 			booksCount.remove(book);
 		} else {
 			booksCount.put(book, count);			
 		}
 	}
-	
-	public void removeBooks(Book book, int count) {
-		if(book == null || count <= 0) { 
-			throw new IllegalArgumentException();
-		}
 		
-		if(booksCount.containsKey(book)) {
-			int currentCount = booksCount.get(book) - count;
-			if(currentCount <= 0) {
-				booksCount.remove(book);
-			} else {
-				booksCount.replace(book, currentCount);				
-			}
-		}		
-	}
-	
 	public void addBooks(Book book, int count) {
 		if(book == null || count <= 0) { 
 			throw new IllegalArgumentException();
@@ -235,23 +234,56 @@ public class Order implements Identified<Integer>, Serializable /*Externalizable
 		return "Order [ID=" + id + ", DataOrder=" + dateFormat.format(dateOrder) + ", DateRelease=" + dateFormat.format(dateRelease) + 
 				", Price=" + getPrice() + ", IdCountBooks=" + booksCount.toString() + ", Status=" + status.toString() + "]";
 	}
-/*
-	private Integer id;
- 	private Date dateOrder;
- 	private Date dateRelease;
- 	transient private Map<Book, Integer> booksCount;
- 	private Status status;
+
+	private static class Pair<K, V> implements Serializable {		
+		private static final long serialVersionUID = 1L;
+
+		public Pair(K key, V value) {
+			this.key = key;
+			this.value = value;
+		}
+		
+		private K key;
+		private V value;
+
+		public K getKey() {
+			return key;
+		}
+
+		public V getValue() {
+			return value;
+		}
+	}
 
 	public void writeExternal(ObjectOutput out) throws IOException {
-			out.writeObject(id);
-			out.writeObject(dateOrder);
-			out.writeObject(dateRelease);
-			out.writeObject(booksCount.keySet());
-			out.writeObject(status);			
+		out.writeObject(id);
+		out.writeObject(dateOrder);
+		out.writeObject(dateRelease);
+		List<Pair<Integer, Integer>> idsCount = new ArrayList<Pair<Integer, Integer>>();
+		for(Entry<Book, Integer> bc : booksCount.entrySet()) {
+			idsCount.add(new Pair<Integer, Integer>(bc.getKey().getId(), bc.getValue()));
+		}
+		out.writeObject(idsCount);	
+		out.writeObject(status);
 	}
 
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-		
+		final Storable<Book> bookStore = StorageFactory.getInstance().getBookStorage();
+		this.id = (Integer)(in.readObject());
+		this.dateOrder = (Date)(in.readObject());
+		this.dateRelease = (Date)(in.readObject());
+			
+		@SuppressWarnings("unchecked")
+		List<Pair<Integer, Integer>> idsCount = (List<Pair<Integer, Integer>>)in.readObject();
+		booksCount = new HashMap<Book, Integer>();
+		for (Pair<Integer, Integer> pair : idsCount) {
+			try {
+				booksCount.put(bookStore.getById(pair.getKey()), pair.getValue());
+			} catch (StorageException e) {
+				e.printStackTrace();
+				System.exit(0);
+			}
+		}
+		this.status = (Status)(in.readObject());
 	}
-	*/
 }

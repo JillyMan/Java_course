@@ -93,6 +93,7 @@ public class Program {
 				
 		fileUtil.writeToFile(orders);
 		orders = fileUtil.readFromFile();
+		
 		System.out.println("DataBase store orders: ");
 		for (Order order : orders) {
 			System.out.println("\t" + order);

@@ -13,6 +13,7 @@ public class EquipOrderMenu {
 	
 	private BookShop shop = BookShop.getInstance();
 	
+	//TODO: Add method rebild button, it's very important!
 	public Menu getMenu() {
 		Menu result = new Menu("Equip order");
 
